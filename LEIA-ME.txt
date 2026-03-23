@@ -1,0 +1,102 @@
+================================================================
+  MÓDULO FINANCEIRO STANDALONE
+  Extraído do sistema principal (libcurso)
+================================================================
+
+ESTRUTURA:
+----------
+sistema/
+├── index.php                    <- Ponto de entrada principal (HTML)
+├── index-action.php             <- Ponto de entrada AJAX (sem HTML)
+├── default.php                  <- Página padrão
+├── include/
+│   ├── config.php               <- Configuração (DB, rotas, constantes)
+│   └── functions/
+│       ├── functions.php        <- Funções utilitárias
+│       └── FWA_Autenticacao.php <- Autenticação e permissões
+├── controller/
+│   ├── CommandAC.php            <- Roteador de comandos AJAX
+│   ├── PadraoAC.php             <- Controller base
+│   ├── CarregarOptionsAC.php    <- Opções de selects
+│   ├── GerenciarLoginAC.php     <- Login
+│   ├── GerenciarLancamentosContabeisAC.php
+│   ├── GerenciarPlanoContasAC.php
+│   ├── GerenciarCentroCustoAC.php
+│   ├── GerenciarRateiosAC.php
+│   └── GerenciarFontesRecursoAC.php
+├── domain/
+│   ├── util/PadraoVO.php        <- Value Object base (magic get/set)
+│   ├── DAO.php                  <- Data Access Object base
+│   ├── ConexaoDB.php            <- Singleton de conexão
+│   ├── ADODBConnection.php      <- Factory de conexão ADODB
+│   ├── enumSistema.php          <- Constantes de sistemas/permissões
+│   ├── Evento.php               <- Stub mínimo (compatibilidade)
+│   ├── LancamentosContabeis.php, LancamentosContabeisVO.php, LancamentosContabeisDAO.php
+│   ├── PlanoContas.php, PlanoContasVO.php, PlanoContasDAO.php
+│   ├── CentroCusto.php, CentroCustoVO.php, CentroCustoDAO.php
+│   ├── Rateios.php, RateiosVO.php, RateiosDAO.php
+│   └── FontesRecurso.php, FontesRecursoVO.php, FontesRecursoDAO.php
+├── view/admin/
+│   ├── login.php
+│   ├── titulo_area_admin.php
+│   ├── area_admin_menu_administracao.php
+│   ├── area_admin_menu_financeiro.php
+│   ├── GerenciarLancamentosContabeis.php
+│   ├── GerenciarPlanoContas.php
+│   ├── GerenciarCentroCusto.php
+│   ├── GerenciarRateios.php
+│   └── GerenciarFontesRecurso.php
+├── resources/
+│   ├── js/   (default.js, jquery.form.js, jquery.tablesorter.js)
+│   └── image/ (alterar.gif, fig-excluir.gif, loading-9.gif)
+└── lib/
+    └── adodb-5.22.4/            <- Biblioteca ADODB (acesso ao banco)
+
+
+CONFIGURAÇÃO:
+-------------
+1. Ajuste as credenciais do banco em:
+   domain/ADODBConnection.php
+   (host, user, pass, db)
+
+2. Ajuste o COD_EVENTO padrão em:
+   include/config.php (linha: define('COD_EVENTO', '115'))
+
+3. Ajuste WB_PATH em include/config.php se o sistema
+   não estiver na raiz /sistema/ do servidor web.
+
+4. Configure o servidor web (Apache/Nginx) para
+   apontar o document_root corretamente.
+
+
+TABELAS DO BANCO DE DADOS NECESSÁRIAS:
+--------------------------------------
+Tabelas do módulo financeiro:
+  - fin_lancamentos_contabeis
+  - fin_plano_contas
+  - fin_centro_custo
+  - fin_rateios
+  - fin_fontes_recurso
+
+Tabelas de autenticação/permissões:
+  - sis_usuarios
+  - sis_grupos
+  - sis_ligacao_usuarios_grupos
+  - sis_ligacao_usuarios_eventos
+  - sis_direitos_grupos_sistemas
+  - sis_sistemas
+  - tab_convidados (opcional, para nome de exibição)
+  - sis_gestor (referenciada em JOINs mas não obrigatória)
+
+A permissão financeira usa: SIS_CONTROLE_FINANCEIRO = 7
+O usuário precisa estar em um grupo com cod_sistema=7 e cod_direito=5.
+
+
+COMO FUNCIONA:
+--------------
+- Login via sis_usuarios (bcrypt)
+- Verifica permissão SIS_CONTROLE_FINANCEIRO
+- Todas as operações CRUD via AJAX (jQuery + CommandAC.php)
+- Roteamento: ?c=NomeClasse&m=metodo → controller/NomeClasseAC.php
+- VOs usam magic methods (__call) para get/set automáticos
+- DAOs usam ADODB com GetInsertSQL/GetUpdateSQL para SQL dinâmico
