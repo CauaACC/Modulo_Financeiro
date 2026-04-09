@@ -1,0 +1,19 @@
+/* TableSorter - Tema básico */
+table.tablesorter {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+table.tablesorter thead th {
+    cursor: pointer;
+    background-color: #e6e6e6;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+}
+table.tablesorter tbody td {
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+}
+table.tablesorter tbody tr:hover {
+    background-color: #ffffcc;
+}
