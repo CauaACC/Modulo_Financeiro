@@ -66,6 +66,15 @@ require_once(dirname(__FILE__) . "/functions/functions.php");
 // === AUTOLOADER ===
 define('WB_ROOT', dirname(__FILE__) . '/../');
 
+// Diretório de cache usado pelo ADODB (customização em lib/adodb-5.22.4/adodb.inc.php:191)
+if (!defined('WB_PATH_LOG_CACHE')) {
+    $cacheDir = WB_ROOT . 'tmp/adodb_cache';
+    if (!is_dir($cacheDir)) {
+        @mkdir($cacheDir, 0777, true);
+    }
+    define('WB_PATH_LOG_CACHE', $cacheDir);
+}
+
 $path = WB_ROOT . 'controller';
 $path .= PATH_SEPARATOR . WB_ROOT . 'domain';
 $path .= PATH_SEPARATOR . WB_ROOT . 'domain/util';
@@ -90,13 +99,15 @@ if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['HTTP_HOST'] == 'eventos.te
     $PROTOCOLO = "http";
 }
 
-// Ajuste WB_PATH conforme o caminho do seu servidor web
-define('WB_PATH', '/sistema');
+// Auto-detecta WB_PATH a partir do diretório do front-controller (index.php / index-action.php)
+$scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+$scriptDir = rtrim($scriptDir, '/');
+define('WB_PATH', $scriptDir);
 define('WB_URL', $PROTOCOLO . '://' . $_SERVER['HTTP_HOST']);
 define('WB_URL_ACTION', WB_URL . WB_PATH . '/index-action.php');
 define('WB_URL_COMMAND', WB_URL_ACTION . '?content=controller/CommandAC.php');
 define('WB_URL_VIEW', WB_URL . WB_PATH . '/index.php');
-define('WB_URL_SITE', WB_URL . WB_PATH);
+define('WB_URL_SITE', WB_URL . WB_PATH . '/');
 define('WB_URL_IMG', WB_URL . WB_PATH . '/resources/image');
 define('IP', $_SERVER['REMOTE_ADDR']);
 

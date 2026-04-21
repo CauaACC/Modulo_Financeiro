@@ -29,9 +29,61 @@ require_once(dirname(__FILE__) . "/include/config.php");
 
     <style>
         body { padding-top: 60px; }
-        .cabecalho { background-color: #2c3e50; }
+        .cabecalho { background-color: #1e8449; border-color: #196f3d; }
         .cabecalho .navbar-brand { color: #fff; }
+        .cabecalho .navbar-nav > li > a { color: #eafaf1; }
+        .cabecalho .navbar-nav > li > a:hover,
+        .cabecalho .navbar-nav > li > a:focus { background-color: #196f3d; color: #fff; }
         .submenu-area a { margin-right: 5px; margin-bottom: 5px; }
+
+        /* Botões primários em verde */
+        .btn-primary {
+            background-color: #27ae60;
+            border-color: #229954;
+        }
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary.active,
+        .open > .dropdown-toggle.btn-primary {
+            background-color: #1e8449;
+            border-color: #196f3d;
+        }
+
+        /* Cabeçalho dos panels com toque verde */
+        .panel-default > .panel-heading {
+            background-color: #eafaf1;
+            border-color: #a9dfbf;
+            color: #1e8449;
+        }
+
+        /* Links padrão */
+        a { color: #1e8449; }
+        a:hover, a:focus { color: #145a32; }
+
+        /* Botões em formato pill (consistência com o menu/ações) */
+        .btn { border-radius: 20px; padding-left: 14px; padding-right: 14px; }
+        .btn-xs { padding-left: 10px; padding-right: 10px; }
+
+        /* Ícones de ação nas linhas (editar/excluir) */
+        img.editar, img.excluir {
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            padding: 4px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            transition: background-color .15s, border-color .15s;
+            vertical-align: middle;
+        }
+        img.editar { background-color: #eafaf1; border-color: #a9dfbf; }
+        img.editar:hover { background-color: #a9dfbf; border-color: #27ae60; }
+        img.excluir { background-color: #fdecea; border-color: #f5b7b1; margin-left: 4px; }
+        img.excluir:hover { background-color: #f5b7b1; border-color: #c0392b; }
+
+        /* Panel com bordas arredondadas consistentes */
+        .panel { border-radius: 8px; overflow: hidden; }
+        .panel-default { border-color: #e5e7e9; }
     </style>
 </head>
 <body>
