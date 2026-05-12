@@ -43,6 +43,25 @@ class CarregarOptionsAC {
         }
     }
 
+    public static function planoContas($fws_, $debug = false) {
+        try {
+            $objPlanoContas = new PlanoContas();
+            $objPlanoContas->carregarListaPlanoContas(false, $debug);
+            $lista = $objPlanoContas->getListaPlanoContas();
+            if ($lista) {
+                foreach ($lista as $objL) {
+                    ?>
+                    <option
+                        <?php echo verifItemSelected(@$fws_['cod_plano_contas'], $objL->getCodPlanoContas()) ?>
+                        value='<?php echo $objL->getCodPlanoContas() ?>'><?php echo $objL->getCodigoContabil() . ' - ' . $objL->getNomePlanoContas() ?></option>
+                    <?php
+                }
+            }
+        } catch (Exception $exc) {
+            echo "<option value=''>" . $exc->getMessage() . "</option>";
+        }
+    }
+
     public static function planoContasPai($fws_, $debug = false) {
         try {
             $objPlanoContas = new PlanoContas();

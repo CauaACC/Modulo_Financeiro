@@ -21,6 +21,7 @@ class GerenciarRateiosAC {
                   "message":      "' . $obj->getMessage() . '",
                   "codRateio": "' . $obj->getCodRateio() . '",
                   "codRateioPai": "' . $obj->getCodRateioPai() . '",
+                  "codPlanoContas": "' . $obj->getCodPlanoContas() . '",
                   "nomeRateio":"' . $obj->getNomeRateio() . '",
                   "codigoContabilRateio":"' . $obj->getCodigoContabilRateio() . '",
                   "percentual":"' . $obj->getPercentual() . '",

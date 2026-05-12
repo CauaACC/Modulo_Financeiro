@@ -109,6 +109,8 @@ $objSRV = new GerenciarRateiosAC();
                 success: function(data) {
                     //Setando valores para alteração
                     $('#codRateio').val(data.codRateio);
+                    $('#codRateioPai').val(data.codRateioPai);
+                    $('#codPlanoContas').val(data.codPlanoContas);
                     $('#nomeRateio').val(data.nomeRateio);
                     $('#descricao').val(data.descricao);
                     $('#status').val(data.status);
@@ -153,6 +155,8 @@ $objSRV = new GerenciarRateiosAC();
     function limparCampos() {
         //Limpando campos
         $('#codRateio').val('');
+        $('#codRateioPai').val('');
+        $('#codPlanoContas').val('');
         $('#nomeRateio').val('');
         $('#percentual').val('');
         $('#descricao').val('');
@@ -195,13 +199,26 @@ require_once(dirname(__FILE__)."/area_admin_menu_financeiro.php");
                             <label for="codRateioPai">Cod. Rateios Pai:</label>
                             <select id="codRateioPai" name="codRateioPai" class="form-control">
                                 <option value="">Selecione Conta Pai se necessário</option>
-                                <?php 
+                                <?php
                                 try {
                                     CarregarOptionsAC::rateiosPai($fws_);
                                 } catch (Exception $e) {
                                     // echo "<option value=''>Erro ao carregar opções</option>";
                                 }
                             ?>
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-12" style="padding-left: 0px;">
+                            <label for="codPlanoContas">Plano de Contas:</label>
+                            <select id="codPlanoContas" name="codPlanoContas" class="form-control">
+                                <option value="">Selecione o Plano de Contas</option>
+                                <?php
+                                try {
+                                    CarregarOptionsAC::planoContas($fws_);
+                                } catch (Exception $e) {
+                                    // echo "<option value=''>Erro ao carregar opções</option>";
+                                }
+                                ?>
                             </select>
                         </div>
                         <div class="form-group col-sm-10" style="padding-left: 0px;">
