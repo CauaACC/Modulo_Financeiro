@@ -109,6 +109,9 @@ class GerenciarPlanoContasAC {
                     <td>
                         <?php echo $objL->getDesAceitaLancamento(); ?>
                     </td>
+                    <td>
+                        <?php echo $objL->getDesStatus(); ?>
+                    </td>
                 </tr>
                 <?php
             }

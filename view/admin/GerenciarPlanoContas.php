@@ -263,6 +263,13 @@ require_once(dirname(__FILE__)."/area_admin_menu_financeiro.php");
                                 <option value="0">NÃO</option>
                             </select>
                         </div>
+                        <div class="form-group col-sm-12" style="padding-left: 0px;">
+                            <label for="status">Status:</label>
+                            <select id="status" name="status" class="form-control" required>
+                                <option value="1">ATIVADO</option>
+                                <option value="0">DESATIVADO</option>
+                            </select>
+                        </div>
                         <div class="form-group col-sm-12" style="padding-left: 0px;">                  
                             <div id="carregando" class="shown hidden">
                                 <div class="imagem">
@@ -304,6 +311,7 @@ require_once(dirname(__FILE__)."/area_admin_menu_financeiro.php");
                     <th width="20px">Tipo de Conta</th>
                     <th width="40px">Natureza do Saldo</th>
                     <th width="40px">Aceita Lançamento</th>
+                    <th width="40px">Status</th>
                     </thead> 
                     <tbody class="inputs">         
                         <?php
