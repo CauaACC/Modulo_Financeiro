@@ -297,9 +297,8 @@ require_once(dirname(__FILE__)."/area_admin_menu_financeiro.php");
                         <div class="form-group col-sm-12" style="padding-left: 0px;">
                             <label for="conciliado">Conciliado:</label>
                             <select id="conciliado" name="conciliado" class="form-control" required>
-                                <option value="">Selecione...</option>
-                                <option value="1">SIM</option>
-                                <option value="0">NÃO</option>
+                                <option value="0">Pendente</option>    
+                                <option value="1">Conciliado</option>        
                             </select>
                         </div>
                         <div class="form-group col-sm-12" style="padding-left: 0px;">                  
