@@ -139,6 +139,7 @@ $objSRV = new GerenciarPlanoContasAC();
                     $('#aceitaLancamento').val(data.aceitaLancamento);
                     $('#status').val(data.status);
                     $('#salvarPlanoContas').val('Salvar Alterações');
+                    bloquearCamposEdicao();
                     $('#nomePlanoContas').focus();
                     $('html,body').scrollTop(0);
                 }
@@ -175,7 +176,18 @@ $objSRV = new GerenciarPlanoContasAC();
             });
         }
     }
+    function bloquearCamposEdicao() {
+        var tipoVal = $('#tipoConta').val();
+        $('#tipoContaHidden').remove();
+        $('#tipoConta').prop('disabled', true).css('background', '#eee');
+        $('<input type="hidden" id="tipoContaHidden" name="tipoConta">').val(tipoVal).appendTo('#formPlanoContas');
+    }
+    function desbloquearCamposEdicao() {
+        $('#tipoContaHidden').remove();
+        $('#tipoConta').prop('disabled', false).css('background', '');
+    }
     function limparCampos() {
+        desbloquearCamposEdicao();
         //Limpando campos
         $('#codPlanoContas').val('');
         $('#codPlanoContasPai').val('');
@@ -185,6 +197,7 @@ $objSRV = new GerenciarPlanoContasAC();
         $('#codigoContabil').val('');
         $('#descricao').val('');
         $('#aceitaLancamento').val(1);
+        $('#status').val(1);
         $('#getMessage').html('');
         // $('#novoCodPlanoContas').val(0);
         $('#salvarPlanoContas').val('Adicionar');

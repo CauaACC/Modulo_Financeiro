@@ -40,6 +40,14 @@ class GerenciarPlanoContasAC {
             $isForm = true;
             $obj = $this->carregarPlanoContas($fws_);
             $obj->setAll($fws_, $isForm);
+
+            if (!empty($fws_['codPlanoContasPai'])) {
+                $pai = new PlanoContas();
+                $pai->setCodPlanoContas($fws_['codPlanoContasPai']);
+                $pai->getPlanoContasById($debug);
+                $obj->setTipoConta($pai->getTipoConta());
+            }
+
             $obj->salvar($debug);
         } catch (OkException $e) {
             $ok = true;

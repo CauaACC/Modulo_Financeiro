@@ -72,6 +72,7 @@ class CarregarOptionsAC {
                     ?>
                     <option
                         <?php echo verifItemSelected(@$fws_['cod_plano_contas_pai'], $objL->getCodPlanoContas()) ?>
+                        data-tipo='<?php echo $objL->getTipoConta() ?>'
                         value='<?php echo $objL->getCodPlanoContas() ?>'><?php echo $objL->getCodigoContabil() . ' - ' . $objL->getNomePlanoContas() ?></option>
                     <?php
                 }
