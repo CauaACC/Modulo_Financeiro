@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Read(//d/laragon/logs/**)",
-      "Read(//d/laragon/bin/apache/**)"
-    ]
-  }
-}
