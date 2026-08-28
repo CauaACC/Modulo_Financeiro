@@ -1,0 +1,22 @@
+# Bloqueia acesso direto a qualquer arquivo desta pasta via web.
+# Os arquivos sao usados apenas via require_once do PHP (server-side),
+# nunca devem ser servidos pelo Apache.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>
+
+# Belt and suspenders: nega tambem se algum outro vhost reabilitar acesso
+<FilesMatch "\.(php|json|lock|md|txt|xml|yml|yaml|dist|sample)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>

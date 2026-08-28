@@ -1,0 +1,258 @@
+/* ============================================================================
+   Cartao de listagem — abas do cadastro do inscrito
+   (inscritos-cadastro-ok.php e seus includes)
+
+   Nasceu na aba Pedidos em 2026-07-29 com prefixo .ped-*; aqui vira padrao
+   das demais abas com nome generico .card-*.
+
+   Regra desta tela: NADA e truncado. O texto longo (observacao, resumo,
+   justificativa) aparece inteiro e o campo vazio continua visivel como "—".
+   Quem abre o cadastro de um inscrito esta conferindo dado, nao navegando —
+   esconder informacao atras de um clique custa mais do que a linha economizada.
+   ========================================================================== */
+
+/* ---- o cartao ---------------------------------------------------------- */
+.card-item {
+    border:1px solid #e3e3e3;
+    border-left:3px solid #bdbdbd;   /* status periferico: da pra ler a lista
+                                        inteira sem ler o texto */
+    border-radius:6px;
+    padding:10px 14px;
+    margin-bottom:10px;
+    background:#fff;
+}
+.card-item.card-ok     { border-left-color:#43a047; }
+.card-item.card-alerta { border-left-color:#e53935; }
+.card-item.card-info   { border-left-color:#1e88e5; }
+.card-item.card-espera { border-left-color:#fb8c00; }
+
+/* ---- cabecalho: o que identifica e o que decide ------------------------ */
+.card-cab { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.card-titulo { font-weight:700; font-size:14px; color:#212121; }
+.card-sub    { font-size:12px; color:#5f6368; }
+.card-valor  { font-size:16px; font-weight:700; color:#1b5e20; }
+
+.card-badge { font-size:11px; font-weight:600; padding:2px 8px; border-radius:10px;
+              white-space:nowrap; }
+.card-badge-ok     { background:#e8f5e9; color:#1b5e20; }
+.card-badge-info   { background:#e3f2fd; color:#0d47a1; }
+.card-badge-alerta { background:#fdecea; color:#b71c1c; }
+.card-badge-espera { background:#fff3e0; color:#e65100; }
+.card-badge-neutro { background:#eceff1; color:#37474f; }
+
+/* ---- meta: rotulo cinza, valor escuro ---------------------------------- */
+/* Todo valor leva rotulo. Sem rotulo, tres numeros seguidos viram adivinhacao. */
+/* Cinza legivel, NAO apagado: o rotulo tem de ser lido sem esforco (regra do
+   usuario, 2026-07-29). Piso de contraste ~4.5:1 sobre branco. */
+.card-meta { font-size:12px; color:#5a5a5a; margin-top:3px; line-height:1.7; }
+.card-meta b { color:#1a1a1a; font-weight:600; }
+.card-meta b.alerta { color:#b71c1c; }
+.card-meta a { color:#0d47a1; }
+
+/* ---- grade de campos rotulo/valor -------------------------------------- */
+/* Para blocos com muitos campos (Dados Pessoais). As colunas se ajustam
+   sozinhas a largura disponivel — em tela larga enche, no celular vira uma. */
+/* 260px e o minimo em que um e-mail comum cabe sem quebrar no meio da
+   palavra — com 230px saia "…escola.pr.gov.b / r". */
+.card-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+             gap:11px 26px; margin-top:10px; }
+.card-grid-larga { grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); }
+.card-campo { min-width:0; }
+.card-campo-full { grid-column:1 / -1; }
+
+/* O ROTULO e legenda, o VALOR e o conteudo — e era o contrario. Na 1a versao o
+   rotulo vinha em CAIXA ALTA com letter-spacing e peso 600 contra um valor de
+   13px: a mancha do rotulo pesava mais que a do dado, e a tela de Dados
+   Pessoais (60+ campos, a maioria em branco) virava um paredao de legendas com
+   um traco embaixo. Agora o rotulo e caixa baixa, peso normal e cinza; o valor
+   cresce e escurece. Queixa do usuario em 2026-07-29 (2a rodada). */
+.card-rot { display:block; font-size:11.5px; color:#6b7280; font-weight:400;
+            line-height:1.35; }
+.card-val { display:block; font-size:14px; color:#111827; font-weight:600;
+            overflow-wrap:break-word; line-height:1.4; }
+.card-val.vazio { color:#c9c9c9; font-weight:400; }
+.card-val.alerta { color:#b71c1c; }
+
+/* Campo em branco continua visivel (regra da tela), mas sai da varredura: o
+   rotulo tambem clareia. Sem isso, 40 campos vazios competem de igual para
+   igual com os 6 que interessam. */
+.card-campo.campo-vazio .card-rot { color:#adb3ba; }
+
+/* ---- titulo de grupo dentro do cartao ---------------------------------- */
+/* Antes era 11px uppercase bold com um filete embaixo — praticamente o mesmo
+   desenho do rotulo do campo, entao nao havia hierarquia: secao e rotulo se
+   liam no mesmo nivel. Virou faixa com fundo, que e o unico elemento em caixa
+   alta do cartao. */
+.card-secao { font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px;
+              color:#374a52; background:#f2f5f7; border:1px solid #e6ebee;
+              border-radius:4px; padding:6px 10px; margin:22px 0 0; }
+.card-secao:first-child { margin-top:2px; }
+
+/* ---- texto longo: inteiro, sem "ver mais" ------------------------------ */
+.card-texto { font-size:12.5px; color:#2b2b2b; margin-top:10px; white-space:pre-line;
+              word-break:break-word; line-height:1.5; }
+.card-texto .card-rot { margin-bottom:3px; }
+.card-texto-box { background:#fafafa; border:1px solid #f0f0f0; border-radius:4px;
+                  padding:8px 10px; }
+
+/* ---- barra unica de acoes --------------------------------------------- */
+/* Todas as acoes do item na mesma linha, mesmo tamanho, na ordem do fluxo de
+   trabalho. A destrutiva vai por ultimo, empurrada para a direita. */
+.card-acoes { display:flex; gap:6px; flex-wrap:wrap; align-items:center;
+              margin-top:10px; padding-top:9px; border-top:1px solid #f2f2f2; }
+.card-acoes .btn { font-size:12px; }
+.card-acoes .card-excluir { color:#b71c1c; margin-left:auto; }
+
+/* Botao montado por JS entra na barra sem virar UM item do flex */
+.card-acoes .card-slot { display:contents; }
+
+/* ---- barra de acoes do bloco (topo do fieldset) ------------------------ */
+.card-barra-topo { display:flex; gap:6px; flex-wrap:wrap; align-items:center;
+                   margin-bottom:10px; }
+.card-barra-topo .card-dir { margin-left:auto; }
+
+/* ---- cor dos botoes do cartao ------------------------------------------ */
+/* O FUNDO continua vindo do tema do evento (--btn-bg-color no
+   bootstrap-adapt-<evento>.css / -padrao): .btn-primary, e nao uma cor propria
+   aqui, senao seria um segundo verde fora do padrao do sistema.
+
+   A LETRA, porem, precisa ser forcada. O jQuery UI (jquery-ui.css do CDN, no
+   fim do inscritos-cadastro-ok.php) traz `.ui-widget-content a { color:#333 }`
+   e os paineis das abas SAO .ui-widget-content. Essa regra tem a mesma
+   especificidade do `a.btn-primary` do tema (0,1,1) e carrega depois, entao
+   ganhava por ordem: o botao nascia com letra cinza escura sobre o verde e so
+   virava branca no hover (que casa .btn-primary:hover, 0,2,0). Efeito
+   invertido — a queixa de 2026-07-29.
+
+   Colocando o container no seletor a especificidade sobe para (0,4,0) e a letra
+   fica branca em TODOS os estados. Ficam de fora .btn-link e .btn-default, que
+   tem fundo claro e precisam de letra escura (ex.: .card-excluir, vermelho). */
+.card-barra-topo .btn:not(.btn-link):not(.btn-default),
+.card-barra-topo .btn:not(.btn-link):not(.btn-default):link,
+.card-barra-topo .btn:not(.btn-link):not(.btn-default):visited,
+.card-barra-topo .btn:not(.btn-link):not(.btn-default):hover,
+.card-barra-topo .btn:not(.btn-link):not(.btn-default):focus,
+.card-barra-topo .btn:not(.btn-link):not(.btn-default):active,
+.card-acoes .btn:not(.btn-link):not(.btn-default),
+.card-acoes .btn:not(.btn-link):not(.btn-default):link,
+.card-acoes .btn:not(.btn-link):not(.btn-default):visited,
+.card-acoes .btn:not(.btn-link):not(.btn-default):hover,
+.card-acoes .btn:not(.btn-link):not(.btn-default):focus,
+.card-acoes .btn:not(.btn-link):not(.btn-default):active,
+.ped-acoes .btn:not(.btn-link):not(.btn-default),
+.ped-acoes .btn:not(.btn-link):not(.btn-default):link,
+.ped-acoes .btn:not(.btn-link):not(.btn-default):visited,
+.ped-acoes .btn:not(.btn-link):not(.btn-default):hover,
+.ped-acoes .btn:not(.btn-link):not(.btn-default):focus,
+.ped-acoes .btn:not(.btn-link):not(.btn-default):active,
+/* TODA barra de acao nova entra AQUI. A .dp-cab-acoes nasceu de fora desta
+   lista e o "Alterar cadastro" voltou a sair com letra escura sobre o verde —
+   o mesmo defeito de 2026-07-29, de novo. */
+.dp-cab-acoes .btn:not(.btn-link):not(.btn-default),
+.dp-cab-acoes .btn:not(.btn-link):not(.btn-default):link,
+.dp-cab-acoes .btn:not(.btn-link):not(.btn-default):visited,
+.dp-cab-acoes .btn:not(.btn-link):not(.btn-default):hover,
+.dp-cab-acoes .btn:not(.btn-link):not(.btn-default):focus,
+.dp-cab-acoes .btn:not(.btn-link):not(.btn-default):active {
+    color:#fff;
+}
+
+/* ---- totalizador / rodape do bloco ------------------------------------- */
+.card-total { margin-top:12px; padding:9px 13px; background:#f7f8fa;
+              border:1px solid #e2e2e2; border-radius:6px; font-size:13px;
+              color:#444; display:flex; gap:22px; flex-wrap:wrap; }
+.card-total b { color:#1b5e20; font-size:14px; }
+
+/* ---- estado vazio ------------------------------------------------------ */
+.card-vazio-lista { padding:22px 12px; text-align:center; color:#5a5a5a;
+                    font-style:italic; font-size:13px; }
+
+/* ---- lista de arquivos / linhas acessorias ----------------------------- */
+.card-arquivos { margin-top:8px; font-size:12px; }
+.card-arquivos .card-arquivo { padding:4px 0; border-top:1px dashed #e0e0e0; color:#333; }
+.card-arquivos .card-arquivo:first-child { border-top:0; }
+
+@media (max-width: 640px) {
+    .card-cab { gap:6px; }
+    .card-acoes .card-excluir { margin-left:0; }
+    .card-total { gap:10px; }
+}
+
+/* ======================================================================== */
+/* Ficha de dados pessoais no desenho da PREVIA DA NFS-e (.nfse-previa /     */
+/* .nfse-grupo, em inscritos-cadastro-ok-nfse-scripts.php).                 */
+/*                                                                          */
+/* Nao e um segundo tema: e o MESMO desenho da prévia, so que aqui ele       */
+/* precisa dar conta de 60+ campos em vez das 6 linhas de um modal — por     */
+/* isso os pares rotulo/valor entram numa grade que se ajusta a largura, e   */
+/* nao numa coluna unica.                                                    */
+/* Usado pela aba Dados Pessoais (leitura) e pela ficha de alteracao/inclusao*/
+/* do inscrito (formulario).                                                 */
+/* ======================================================================== */
+
+/* ---- leitura: rotulo a esquerda, valor a direita, filete embaixo -------- */
+/* Corpo da ficha SEM moldura, como na previa: nada de borda, fundo ou filete
+   lateral em volta. Existe so para dar respiro entre o cabecalho e a 1a secao. */
+.dp-corpo { margin-top:2px; }
+
+.dp-secao { display:flex; justify-content:space-between; align-items:center;
+            border-bottom:1px solid #eee; padding-bottom:6px; margin:22px 0 2px;
+            font-size:12px; text-transform:uppercase; color:#999; font-weight:600;
+            letter-spacing:0.4px; }
+.dp-secao:first-of-type { margin-top:6px; }
+
+.dp-ficha { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));
+            gap:0 26px; font-size:12px; }
+.dp-linha { display:flex; align-items:flex-start; min-width:0;
+            padding:6px 0; border-bottom:1px solid #f0f0f0; }
+.dp-linha-full { grid-column:1 / -1; }
+.dp-rot { flex:0 0 145px; color:#888; font-weight:600; padding-right:8px; }
+.dp-val { flex:1 1 auto; min-width:0; color:#333; word-break:break-word; }
+.dp-val.vazio { color:#c4c9ce; }
+.dp-val small { color:#777; }
+.dp-texto { white-space:pre-line; line-height:1.5; }
+
+/* ---- formulario: caixa por assunto, campos compactos ------------------- */
+.dp-grupo { border:1px solid #e8e8e8; border-radius:6px; padding:12px 14px;
+            margin-top:12px; background:#fafafa; }
+.dp-grupo-tit { font-size:11px; text-transform:uppercase; color:#888; font-weight:700;
+                letter-spacing:0.5px; margin-bottom:10px; }
+.dp-grupo label { font-size:11px; color:#777; font-weight:600; margin-bottom:2px;
+                  display:block; }
+.dp-grupo .form-control { font-size:12px; }
+.dp-grupo input.form-control,
+.dp-grupo select.form-control { height:30px; padding:4px 8px; }
+.dp-grupo .linha { display:flex; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+.dp-grupo .linha:last-child { margin-bottom:0; }
+/* Largura em DOZE AVOS, como as col-* que estavam aqui antes, mas descontando
+   o gap no proprio flex-basis — era isso que fazia a ultima coluna de cada
+   linha estourar 100% e cair sozinha na linha de baixo.
+   Aqui vao flex-grow/shrink SEPARADOS: a shorthand `flex` zeraria o flex-basis
+   das classes abaixo (esta regra e mais especifica que elas). */
+.dp-grupo .linha > div { flex-grow:1; flex-shrink:1; min-width:0; }
+.dp-grupo .dp-c12 { flex-basis:calc(100%      - 10px); }
+.dp-grupo .dp-c8  { flex-basis:calc(66.666%   - 10px); }
+.dp-grupo .dp-c6  { flex-basis:calc(50%       - 10px); }
+.dp-grupo .dp-c4  { flex-basis:calc(33.333%   - 10px); }
+.dp-grupo .dp-c3  { flex-basis:calc(25%       - 10px); }
+.dp-grupo .dp-c2  { flex-basis:calc(16.666%   - 10px); }
+.dp-grupo .dp-check { font-size:12px; color:#333; font-weight:normal; }
+.dp-grupo .dp-check input { margin-right:6px; }
+
+/* Cabecalho da ficha: titulo + acoes, no mesmo desenho do .nfse-modo-cab. */
+.dp-cab { display:flex; justify-content:space-between; align-items:center;
+          gap:10px; flex-wrap:wrap; border-bottom:1px solid #eee;
+          padding-bottom:6px; margin-bottom:4px; font-size:12px;
+          text-transform:uppercase; color:#999; font-weight:600;
+          letter-spacing:0.4px; }
+.dp-cab .dp-cab-acoes { display:flex; gap:6px; flex-wrap:wrap; }
+/* A barra e caixa alta, os botoes nao. <button> ja vem com text-transform:none
+   do reset, mas <a class="btn"> herda — e o mesmo botao aparecia "ALTERAR
+   CADASTRO" na leitura e "Salvar alteracao" no formulario. */
+.dp-cab .btn { text-transform:none; letter-spacing:normal; }
+
+@media (max-width: 640px) {
+    .dp-linha { flex-direction:column; }
+    .dp-rot { flex:0 0 auto; padding-right:0; }
+    .dp-grupo .linha > div { flex-basis:calc(100% - 10px); }
+}

@@ -1,0 +1,269 @@
+<?php
+
+require_once(dirname(__FILE__)."/../../include/config.php");
+require_once(dirname(__FILE__)."/../../view/admin/consulta-avaliacao-trabalhos-cabecalho.php");
+require_once(dirname(__FILE__)."/../../view/admin/consulta-avaliacao-trabalhos-busca.php");
+#----------------------------------------------------------------------
+#Conectar no Banco
+$debug = false;
+if ($_SERVER['REMOTE_ADDR'] == '189.90.70.566') {
+    $debug = true;
+}
+$fws_['cod_area_tematica'] = $fws_['cod_area_tematica'] == '' ? $_GET['cod_area_tematica'] : $fws_['cod_area_tematica'];
+$COD_CONVIDADO = $fws_['cod_convidado'] == '' ? $_GET['cod_convidado'] : $fws_['cod_convidado'];
+
+$Conexao_db = FWA_Conexao("OpcTec");
+#----------------------------------------------------------------------
+#Mensagens de ERRO
+$MSG = $_SESSION['MSG'];
+If ($MSG) {
+//  echo "<hr size='1' width='100%'>";
+    echo FWA_Mostrar_Mensagem($MSG);
+}
+#----------------------------------------------------------------------
+#Lista Trabalhos a serem avaliados da Area Tematica a qual o convidado esta associado
+## Consulta Trabalhos por Área Temática ##
+$whereAreaTematica = "";
+if ($fws_['cod_area_tematica']) {
+    $whereAreaTematica = " and toat.cod_area_tematica = " . $fws_['cod_area_tematica'];
+}
+
+#Definindo comando SQL
+$var_sql = "
+                 SELECT 
+                  tc.cod_convidado
+                 ,tc.nome_convidado
+                 ,tc.e_mail                 
+                    ,(
+                    SELECT COUNT(tba.cod_area_tematica) AS total_avaliados_pelo_avaliador
+                    FROM tab_trabalhos_avaliacao tba, tab_inscritos ti 
+                    WHERE (tba.cod_area_tematica=toat.cod_area_tematica)
+                      AND(tba.cod_inscrito     =ti.cod_inscrito)
+                      AND(ti.status            ='ATIVADA')
+                      AND((tba.avaliacao='APROVADO')OR(tba.avaliacao='REPROVADO'))
+                      AND(tba.cod_avaliador    =tc.cod_usuario)
+                    GROUP BY tba.cod_area_tematica
+                    ) AS Avaliados_pelo_Avaliador
+                    ,(
+                    SELECT COUNT(tba.cod_area_tematica) AS total_aprovados_pelo_avaliador
+                    FROM tab_trabalhos_avaliacao tba, tab_inscritos ti 
+                    WHERE (tba.cod_area_tematica=toat.cod_area_tematica)
+                      AND(tba.cod_inscrito     =ti.cod_inscrito)
+                      AND(ti.status            ='ATIVADA')
+                      AND(tba.avaliacao        ='APROVADO')
+                      AND(tba.cod_avaliador    =tc.cod_usuario)
+                    GROUP BY tba.cod_area_tematica
+                    ) AS Aprovados_pelo_Avaliador
+                    ,(
+                    SELECT COUNT(tba.cod_area_tematica) AS total_reprovados_pelo_avaliador
+                    FROM tab_trabalhos_avaliacao tba, tab_inscritos ti 
+                    WHERE (tba.cod_area_tematica=toat.cod_area_tematica)
+                      AND(tba.cod_inscrito     =ti.cod_inscrito)
+                      AND(ti.status            ='ATIVADA')
+                      AND(tba.avaliacao        ='REPROVADO')
+                      AND(tba.cod_avaliador    =tc.cod_usuario)
+                    GROUP BY tba.cod_area_tematica
+                    ) AS Reprovados_pelo_Avaliador
+                 ,toat.cod_area_tematica
+                 ,toat.titulo
+                 ,toat.n_max_trab_por_avaliador
+                    ,(
+                    SELECT COUNT(tb.cod_area_tematica) AS total_inscritos
+                    FROM tab_trabalhos tb, tab_inscritos ti 
+                    WHERE (tb.cod_area_tematica=toat.cod_area_tematica)
+                      AND(tb.cod_inscrito     =ti.cod_inscrito)
+                      AND(ti.status           ='ATIVADA')
+                      AND(tb.status           ='ATIVADA')
+                    GROUP BY tb.cod_area_tematica
+                    ) AS total_inscritos
+                    ,(
+                    SELECT COUNT(tba.cod_area_tematica) AS total_avaliados
+                    FROM tab_trabalhos_avaliacao tba, tab_inscritos ti 
+                    WHERE (tba.cod_area_tematica=toat.cod_area_tematica)
+                      AND(tba.cod_inscrito     =ti.cod_inscrito)
+                      AND(ti.status            ='ATIVADA')
+                      AND((tba.avaliacao='APROVADO')OR(tba.avaliacao='REPROVADO'))
+                    GROUP BY tba.cod_area_tematica
+                    ) AS total_avaliados
+                    ,(
+                    SELECT COUNT(tba.cod_area_tematica) AS total_aprovados
+                    FROM tab_trabalhos_avaliacao tba, tab_inscritos ti 
+                    WHERE (tba.cod_area_tematica=toat.cod_area_tematica)
+                      AND(tba.cod_inscrito     =ti.cod_inscrito)
+                      AND(ti.status            ='ATIVADA')
+                      AND(tba.avaliacao        ='APROVADO')
+                    GROUP BY tba.cod_area_tematica
+                    ) AS total_aprovados
+                    ,(
+                    SELECT COUNT(tba.cod_area_tematica) AS total_reprovados
+                    FROM tab_trabalhos_avaliacao tba, tab_inscritos ti 
+                    WHERE (tba.cod_area_tematica=toat.cod_area_tematica)
+                      AND(tba.cod_inscrito     =ti.cod_inscrito)
+                      AND(tba.avaliacao        ='REPROVADO')
+                    GROUP BY tba.cod_area_tematica
+                    ) AS total_reprovados
+            FROM tab_opcoes_areas_tematicas toat
+            INNER JOIN tab_lig_convidados_areas_tematicas tlca ON toat.cod_area_tematica = tlca.cod_area_tematica 
+            INNER JOIN sis_ligacao_usuarios_eventos lue on tlca.cod_evento=lue.cod_evento
+            inner join sis_usuarios on su on su.cod_usuario=lue.cod_usuario
+            INNER JOIN tab_convidados tc ON su.cod_usuario=tc.cod_usuario 
+            WHERE toat.cod_evento=" . COD_EVENTO . "
+                " . $whereAreaTematica . "
+            ORDER BY toat.titulo, tc.nome_convidado 
+               ";
+
+$RS = FWA_Executa_SQL($debug, $Conexao_db, $var_sql); //Consulta login existe   
+#Verificando se houve retorno de algum registro
+If (!$RS->EOF) {
+    echo "<table border='0' width='100%' colspan='0' cellspacing='0'>";
+    While (!$RS->EOF) {
+        $cod_convidado = $RS->fields[0];
+        $nome_convidado = $RS->fields[1];
+        $e_mail = $RS->fields[2];
+        $total_avaliados_pelo_avaliador = $RS->fields[3];
+        $total_aprovados_pelo_avaliador = $RS->fields[4];
+        $total_reprovados_pelo_avaliador = $RS->fields[5];
+        $cod_area_tematica = $RS->fields[6];
+        $titulo_area_tematica = $RS->fields[7];
+        $n_max_trab_por_avaliador = $RS->fields[8];
+        $total_inscritos = $RS->fields[9];
+        $total_avaliados = $RS->fields[10];
+        $total_aprovados = $RS->fields[11];
+        $total_reprovados = $RS->fields[12];
+
+        If ($total_avaliados_pelo_avaliador == "") {
+            $total_avaliados_pelo_avaliador = 0;
+        }
+        If ($total_aprovados_pelo_avaliador == "") {
+            $total_aprovados_pelo_avaliador = 0;
+        }
+        If ($total_reprovados_pelo_avaliador == "") {
+            $total_reprovados_pelo_avaliador = 0;
+        }
+
+        If ($total_inscritos == "") {
+            $total_inscritos = 0;
+        }
+        If ($total_avaliados == "") {
+            $total_avaliados = 0;
+        }
+        If ($total_aprovados == "") {
+            $total_aprovados = 0;
+        }
+        If ($total_reprovados == "") {
+            $total_reprovados = 0;
+        }
+
+        If (@$titulo_area_tematica_ant != $titulo_area_tematica) {
+
+            $total_geral_inscritos = $total_geral_inscritos + $total_inscritos;
+            $total_geral_avaliados = $total_geral_avaliados + $total_avaliados;
+            $total_geral_aprovados = $total_geral_aprovados + $total_aprovados;
+            $total_geral_reprovados = $total_geral_reprovados + $total_reprovados;
+
+            echo "
+          <tr>
+            <td colspan='3' class='subtitulo'>
+              <br><br><hr size='1' width='100%'>
+              <h4><a name='" . $cod_area_tematica . "'>
+                Área Temática:
+                <a class='linkg' href='index.php?content=view/admin/area-tematica-cadastro-alterar.php&cod_area_tematica=" . $cod_area_tematica . "'
+                    title='Editar Área Temática'><img src='resources/image/fig-alterar.gif' alt='Editar' border='0'></a>
+                -   
+                <a class='linkg' href='index.php?content=view/admin/consulta-avaliacao-trabalhos-listagem.php&cod_area_tematica=" . $cod_area_tematica . "'
+                    title='Editar Área Temática'>" . $titulo_area_tematica . "</a>
+              </h4>
+              
+              <a class='linkg' href='index.php?content=view/admin/re-avaliacao-trabalhos-listagem.php&cod_area_tematica=" . $cod_area_tematica . "'
+              title='Avaliar Trabalhos como Administrador'><input type='button' value='Avaliar como Administrador' class='btn btn-xs btn-primary'></a>
+              <br>
+              
+              | Total Trabahos -> Inscritos: " . $total_inscritos . "
+              | A Serem Avaliados por cada Avaliador: " . $n_max_trab_por_avaliador . "
+              | 
+
+              <br>
+              | Total Trabahos ->
+                Avaliados: " . $total_avaliados . "
+              | Aprovados: " . $total_aprovados . "
+              | Reprovados:" . $total_reprovados . "
+              |
+              
+            </td>
+          </tr>
+          <tr><td colspan='3'>
+                <br>Avaliadores: 
+                <a class='linkg' href='index.php?content=view/admin/ligacao-convidados-areas-tematicas-listagem.php&cod_area_tematica=" . $cod_area_tematica . "&COD_CONVIDADO=" . $_GET['COD_CONVIDADO'] . "'
+                title='Adicionar Avaliador'><input type='button' value='Adicionar Avaliador' class='btn btn-xs btn-primary'></a>
+                <br>&nbsp;
+          </td></tr>
+          ";
+        }
+
+//        if ($nome_convidado != '') {
+            echo "
+            <tr valign='top'>
+            <td width='5%'>";
+
+            echo "<a href='index.php?content=view/admin/convidados-cadastro-ok.php&COD_CONVIDADO=" . $cod_convidado . "'>
+                    <img src='resources/image/fig-alterar.gif' alt='Editar' title='Editar Convidado' border='0'></a>";
+            echo "<a href='view/admin/ligacao-convidados-areas-tematicas-excluir-grava.php?acao=Excluir&cod_convidado=" . $cod_convidado . "&cod_evento=" . COD_EVENTO . "&cod_area_tematica=" . $cod_area_tematica . "'>
+                    <img src='resources/image/fig-excluir.gif' alt='Excluir' title='Excluir Avaliador' border='0'></a>";
+
+            echo "
+            </td>
+            <td colspan='2' width='95%' >";
+            //echo "<a href='mailto:".$e_mail."' class='link'><b>".$nome_convidado."</b></a>::";
+            if ($cod_convidado == $_GET['COD_CONVIDADO']) {
+                echo "<b>" . $nome_convidado . "</b>:";
+            } else {
+                echo "" . $nome_convidado . ":";
+            }
+
+            echo "      
+              | Total Trabahos ->
+              | Avaliados: " . $total_avaliados_pelo_avaliador . "
+              | Aprovados: " . $total_aprovados_pelo_avaliador . "
+              | Reprovados:" . $total_reprovados_pelo_avaliador . "
+              |
+            </td></tr>
+            ";
+//        }
+        $ii++;
+        $titulo_area_tematica_ant = $titulo_area_tematica;
+        #Movendo para o proximo registro
+        $RS->MoveNext();
+        /*imprimir quando o proximo for diferente*/
+        if ($titulo_area_tematica_ant != $RS->fields[7]) {
+            if ($titulo_area_tematica_ant != '') {
+                echo "<td colspan='2' width='95%' >Total de Avaliadores Cadastrados: " . $ii . "</td></tr>";
+                $ii = "";
+            }
+        }
+
+    }
+    echo "</table><br>";
+}
+
+echo "
+<hr size='1' width='100%'>
+<span style class='textog'>Totais Geral</span>
+              <br>
+              | Total Geral de Trabahos ->
+                Inscritos: " . $total_geral_inscritos . "
+              |
+              <br>
+              | Total Geral de Trabahos ->
+                Avaliados: " . $total_geral_avaliados . "
+              | Aprovados: " . $total_geral_aprovados . "
+              | Reprovados:" . $total_geral_reprovados . "
+              |
+
+<hr size='1' width='100%'>
+
+<a class='link' href='javascript:history.go(-1)'><b>voltar<b></a>
+</body>
+</html>
+";
+?>
+</div></div></div></div></div>

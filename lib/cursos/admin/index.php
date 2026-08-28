@@ -1,0 +1,1 @@
+<?php$dir = dirname(__FILE__);require_once($dir."/../inscricoes/include/config.php");$url = "". WB_URL_VIEW."?content=view/admin/default.php#adminSistema";@header("Location: $url");echo "<HTML><META HTTP-EQUIV=\"REFRESH\" CONTENT=\"0; URL=" . $url . "\"></HTML>";exit();

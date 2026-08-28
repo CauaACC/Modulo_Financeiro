@@ -1,0 +1,155 @@
+<?
+#Montar E-mail
+$FWS_['corpo_email'] = "
+
+<html>
+<head>
+<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1252\">
+<title>Comissão Científica - VII Congresso Nacional Rede Unida</title>
+</head>
+
+<body>
+<img border=\"0\" src=\"http://www.redeunida.org.br/congresso/images/banner_supin.gif\" width=\"737\" height=\"199\" border=\"0\" usemap=\"#Map\">
+
+<map name=\"Map\">
+  <area shape=\"poly\" coords=\"195,28,195,47,260,47,260,28\" href=\"http://www.redeunida.org.br/congresso/inscricoes/\"                                          alt=\"Inscrições\"         border=\"1\">
+  <area shape=\"poly\" coords=\"273,28,273,47,348,43,348,20\" href=\"http://www.redeunida.org.br/congresso/inscricoes/index.php?content=inscricao_trabalhos.php\" alt=\"Envio de Trabalhos\" border=\"1\">
+  <area shape=\"poly\" coords=\"208,59,260,64,259,81,208,82\" href=\"http://www.redeunida.org.br/congresso/apresentacao/apresentacao.php\" alt=\"Apresenta&ccedil;&atilde;o\">
+  <area shape=\"poly\" coords=\"277,56,329,58,330,76,279,79\" href=\"http://www.redeunida.org.br/congresso/programacao/programacao.php\" alt=\"Programa&ccedil;&atilde;o\">
+  <area shape=\"poly\" coords=\"345,50,443,52,442,66,344,67\" href=\"http://www.redeunida.org.br/congresso/hospedagem/hospedagem.php\" alt=\"Hospedagem e Transporte\">
+  <area shape=\"poly\" coords=\"457,40,497,41,492,56,460,56\" href=\"http://www.redeunida.org.br/congresso/noticia/noticia.php\" alt=\"Not&iacute;cias\">
+  <area shape=\"poly\" coords=\"515,30,580,33,580,46,514,48\" href=\"http://www.redeunida.org.br/congresso/curitiba/curitiba.php\" alt=\"Conhe&ccedil;a Curitiba\">
+  <area shape=\"poly\" coords=\"595,20,640,25,638,39,594,39\" href=\"http://www.redeunida.org.br/congresso/comissao/comissao.php\" alt=\"Comiss&otilde;es\">
+  <area shape=\"poly\" coords=\"652,16,705,14,707,33,656,34\" href=\"http://www.redeunida.org.br/congresso/fale/fale.php\" alt=\"Fale Conosco\">
+  <area shape=\"circle\" coords=\"83,75,70\" href=\"http://www.redeunida.org.br/congresso/index.php\" alt=\"P&aacute;gina Principal\">
+</map>
+<table width=\"740\" border=\"0\"><tr><td>
+<p style=\"text-align:justify\">
+<font size=\"2\" face=\"Arial\">
+
+Prezado(a) Sr(a). <b>".$FWS_['nome_inscrito']."</b>,
+<br>Códido Inscrição: <b>".$FWS_['cod_inscrito']."</b>
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Agradecemos o envio do seu resumo para o nosso Congresso.
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Seu trabalho foi <b>APROVADO</b> pela Comissão Científica. Parabéns!
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+É imprescindível confirmar a sua participação no evento com a efetivação da inscrição e quitação do boleto, caso ainda não tenha sido efetuada
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Você poderá acompanhar o status de sua inscrição e, entre outros serviços, gerar 2ª via do boleto bancário através da área restrita do site no link abaixo:<br>
+<br>
+<a href=\"http://www.redeunida.org.br/congresso/inscricoes/index.php?content=inscricao_trabalhos.php\"><font face=\"Verdana\" color=\"black\" size=\"2\">
+Consulta a informações de sua inscrição</font>
+</a>
+<br>
+<b>Atenção:</b> para acessar o sistema é necessário informar número de seu CPF e de inscrição.
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+
+<fieldset widht=\"740\"><legend><font size=\"2\" face=\"Arial\"> Dados do Trabalho Aprovado </font></legend>
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"99%\">
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\"><font face=\"Arial\">
+        Área Temática:<br><b>".$FWS_['titulo']."
+      </font></b>
+    </td>
+  </tr>
+<!--
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+        Nome do Inscrito: <b>".$FWS_['nome_inscrito']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+      E-mail do Inscrito: <b>".$FWS_['e_mail_inscrito']."</b>
+      </font>
+    </td>
+  </tr>
+-->
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+         Nome do Apresentador: <b>".$FWS_['autor_apresentador_nome']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+        E-mail do Apresentador: <b>".$FWS_['autor_apresentador_e_mail']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+       Nomes dos Co-Autores:<br>
+        <b>".$FWS_['nome_co_autores']."</b><br>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+      Instituição do trabalho:<br>
+      <b>".$FWS_['instituicao_trabalho']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+        Cógido do Trabalho: <b>".$FWS_['cod_trabalho']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+      Titulo do Trabalho:<br>
+      <b>".$FWS_['titulo_trabalho']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+        Palavras-chave:<br>
+        <b>".$FWS_['palavras_chave']."</b>
+      </font>
+    </td>
+  </tr>
+</table>
+</fieldset>
+<p style=\"text-align:justify\">
+<font size=\"2\" face=\"Arial\">
+Em caso de dúvidas, favor entrar em contato com a secretaria do congresso através do e-mail: <u><a href=\"mailto:7congresso@uol.com.br\">7congresso@uol.com.br</a></u>.<br>
+
+</font>
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Atenciosamente,
+</font>
+<p><font size=\"2\" face=\"Arial\">
+Secretaria Executiva do VII Congresso Nacional da Rede Unida</font></b>
+</td></tr></table>
+</body>
+</html>
+";
+
+#If($FWS_Debug==1){ echo  $FWS_['corpo_email']."<br><br>"; }
+
+?>

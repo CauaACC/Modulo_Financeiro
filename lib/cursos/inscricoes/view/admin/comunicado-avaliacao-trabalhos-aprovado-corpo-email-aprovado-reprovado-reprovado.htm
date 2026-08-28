@@ -1,0 +1,156 @@
+<?php
+#Montar E-mail
+$FWS_['corpo_email'] = "
+
+<html>
+<head>
+<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1252\">
+<title>Comissão Científica - VII Congresso Nacional Rede Unida</title>
+</head>
+
+<body>
+
+<a href='http://www.redeunida.org.br/congresso/inscricoes/index.php?content=inscricao_trabalhos.php'>
+<font size=\"4\" face=\"Arial\"><h3>
+Comissão Científica - VII Congresso Nacional Rede Unida
+</h3></font>
+</a>
+<br>
+
+<table width=\"740\" border=\"0\"><tr><td>
+<p style=\"text-align:justify\">
+<font size=\"2\" face=\"Arial\">
+
+Prezado(a) Sr(a). <b>".$FWS_['nome_inscrito']."</b>,
+<br>Códido Inscrição: <b>".$FWS_['cod_inscrito']."</b>
+<br>Códido Trabalho: <b>".$FWS_['cod_trabalho']."</b>
+
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Agradecemos o envio do seu resumo para o nosso Congresso.
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+A Comissão Científica do VII Congresso Nacional Rede Unida, decidiu reavaliar os trabalhos inicialmente não aprovados
+e concluiu pela <b>APROVAÇÃO</b> de seu trabalho nessa fase final.
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Portanto, seu trabalho foi <b>APROVADO</b> pela Comissão Científica. Parabéns!
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+É imprescindível confirmar a sua participação no evento com a efetivação da inscrição e quitação do boleto, caso ainda não tenha sido efetuada
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Você poderá acompanhar o status de sua inscrição e, entre outros serviços, gerar 2ª via do boleto bancário através da área restrita do site no link abaixo:<br>
+<br>
+<a href=\"http://www.redeunida.org.br/congresso/inscricoes/index.php?content=inscricao_trabalhos.php\"><font face=\"Verdana\" color=\"black\" size=\"2\">
+Consulta a informações de sua inscrição</font>
+</a>
+<br>
+<b>Atenção:</b> para acessar o sistema é necessário informar número de seu CPF e de inscrição.
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+
+<fieldset widht=\"740\"><legend><font size=\"2\" face=\"Arial\"> Dados do Trabalho Aprovado </font></legend>
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"99%\">
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\"><font face=\"Arial\">
+        Área Temática:<br><b>".$FWS_['titulo']."
+      </font></b>
+    </td>
+  </tr>
+<!--
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+        Nome do Inscrito: <b>".$FWS_['nome_inscrito']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+      E-mail do Inscrito: <b>".$FWS_['e_mail_inscrito']."</b>
+      </font>
+    </td>
+  </tr>
+-->
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+         Nome do Apresentador: <b>".$FWS_['autor_apresentador_nome']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+        E-mail do Apresentador: <b>".$FWS_['autor_apresentador_e_mail']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+       Nomes dos Co-Autores:<br>
+        <b>".$FWS_['nome_co_autores']."</b><br>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+      Instituição do trabalho:<br>
+      <b>".$FWS_['instituicao_trabalho']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+        Cógido do Trabalho: <b>".$FWS_['cod_trabalho']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+      Titulo do Trabalho:<br>
+      <b>".$FWS_['titulo_trabalho']."</b>
+      </font>
+    </td>
+  </tr>
+  <tr>
+    <td valign=\"top\">
+      <font size=\"2\" face=\"Arial\">
+        Palavras-chave:<br>
+        <b>".$FWS_['palavras_chave']."</b>
+      </font>
+    </td>
+  </tr>
+</table>
+</fieldset>
+<p style=\"text-align:justify\">
+<font size=\"2\" face=\"Arial\">
+Em caso de dúvidas, favor entrar em contato com a secretaria do congresso através do e-mail: <u><a href=\"mailto:7congresso@uol.com.br\">7congresso@uol.com.br</a></u>.<br>
+
+</font>
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Atenciosamente,
+</font>
+<p><font size=\"2\" face=\"Arial\">
+Comissão Científica do VII Congresso Nacional da Rede Unida</font></b>
+</td></tr></table>
+</body>
+</html>
+";
+
+#If($FWS_Debug==1){ echo  $FWS_['corpo_email']."<br><br>"; }
+
+?>

@@ -1,0 +1,103 @@
+<?php
+require_once(dirname(__FILE__)."/../inscricoes/include/config.php");
+?>  
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="resources/image/favicon.ico">
+        <title><?php echo ABREV_EVENTO . "-" . NOME_EVENTO; ?></title>
+        <link href="resources/bootstrap-3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="resources/bootstrap-3.3.7/docs/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+        <!-- Custom styles for this template -->
+        <link href="resources/bootstrap-3.3.7/docs/examples/theme/theme.css" rel="stylesheet">
+        <link href="resources/bootstrap-3.3.7/docs/examples/signin/signin.css" rel="stylesheet">
+        <link href="resources/css/bootstrap-adapt<?php echo '-'.COD_EVENTO; ?>.css" rel="stylesheet">
+        
+        <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+        <!--[if lt IE 9]><script src="resources/bootstrap-3.3.7/docs/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+        <script src="resources/bootstrap-3.3.7/docs/assets/js/ie-emulation-modes-warning.js"></script>
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src=".resources/bootstrap-3.3.7/docs/assets/js/vendor/jquery.min.js"><\/script>')</script>
+        <script src="resources/bootstrap-3.3.7/dist/js/bootstrap.min.js"></script>
+        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+        <script src="resources/bootstrap-3.3.7/docs/assets/js/ie10-viewport-bug-workaround.js"></script>
+        <script language="JavaScript1.2" src="resources/js/default.js"></script>
+        <script language="JavaScript1.2" src="resources/js/abrelink.js"></script>
+        <!-- Aviso de sessao expirada (este layout nao passa pelo bootstrap-loader) -->
+        <script src="resources/js/sessao-expirada.js?v=20260810"></script>
+        
+<!--        
+        <link type="text/css" href="resources/js/jquery-ui-1.12.1.custom/jquery-ui.css" rel="stylesheet"/>
+        <script type="text/javascript" src="resources/js/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+        <script type="text/javascript" src="resources/JS/jquery-ui-1.12.1.custom/external/jquery/jquery.js"></script>-->
+        
+<!--    
+        <link type="text/css" href="resources/js/jquery-ui-1.7.3.custom/css/smoothness/jquery-ui-1.7.3.custom.css" rel="stylesheet"/>
+        <script type="text/javascript" src="resources/js/jquery-ui-1.7.3.custom/js/jquery-ui-1.7.3.custom.min.js"></script>
+        <script type="text/javascript" src="resources/js/jquery-ui-1.7.3.custom/js/jquery-1.3.2.min.js"></script>
+-->
+        <!--<script type="text/javascript" src="resources/js/jquery-ui-1.7.3.custom/development-bundle/ui/ui.dialog.js"></script>-->
+        <!--<script type="text/javascript" src="resources/js/jquery/jquery.form.js"></script>-->        
+        <!--<script type="text/javascript" src="resources/js/jquery/jquery.price_format.1.7.min.js"></script>-->
+        <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>-->
+
+
+    </head>
+    <body>
+        <!-- Fixed navbar -->
+<!--        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+              <?php //require "menu.php";?>
+            </div>
+        </nav>-->
+        <div class="container">
+            <!-- Main component for a primary marketing message or call to action -->
+            <!--<div class="jumbotron">-->
+            <?php
+            require 'miolo.php';
+            ?>
+<!--            </div>-->
+        </div>
+        <!-- /container -->
+
+
+    </body>
+</html>
+<!--<script type="text/javascript">
+var LHCChatOptions = {};
+LHCChatOptions.opt = {widget_height:340,widget_width:300,popup_height:520,popup_width:500};
+(function() {
+var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+var referrer = (document.referrer) ? encodeURIComponent(document.referrer.substr(document.referrer.indexOf('://')+1)) : '';
+var location  = (document.location) ? encodeURIComponent(window.location.href.substring(window.location.protocol.length)) : '';
+po.src = '//zaqueu.atlantidaweb.com/livehelper/index.php/por/chat/getstatus/(click)/internal/(position)/bottom_right/(ma)/br/(top)/350/(units)/pixels/(leaveamessage)/true?r='+referrer+'&l='+location;
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+})();
+</script>-->
+<!--<script type="text/javascript">
+var LHCChatOptions = {};
+LHCChatOptions.opt = {widget_height:340,widget_width:300,popup_height:520,popup_width:500};
+(function() {
+var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+var referrer = (document.referrer) ? encodeURIComponent(document.referrer.substr(document.referrer.indexOf('://')+1)) : '';
+var location  = (document.location) ? encodeURIComponent(window.location.href.substring(window.location.protocol.length)) : '';
+po.src = '//zaqueu.atlantidaweb.com/livehelper/index.php/por/chat/getstatus/(click)/internal/(position)/bottom_right/(ma)/br/(top)/350/(units)/pixels/(leaveamessage)/true/(disable_pro_active)/true/(noresponse)/true?r='+referrer+'&l='+location;
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+})();
+</script>-->

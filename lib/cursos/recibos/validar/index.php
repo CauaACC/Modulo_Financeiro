@@ -1,0 +1,1 @@
+<?php$dir = dirname(__FILE__);$_GET['figura']=true;require_once($dir."/../../inscricoes/include/config.php");$fws_['idArquivo'] = addslashes($fwsGet_['id']);$objArquivo = new GerenciarReciboAC();$objArquivo->validarRecibo($fws_);

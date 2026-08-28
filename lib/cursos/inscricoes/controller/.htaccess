@@ -1,0 +1,5 @@
+# BEGIN custom php.ini PHP56
+<IfModule mod_suphp.c>
+    suPHP_ConfigPath /home/opcte984/log/php
+</IfModule>
+# END custom php.ini

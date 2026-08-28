@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Preview - Modal BoleCode Moderno</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f5f5f5; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; padding: 30px 20px; color: #1a1a2e; }
+h2 { text-align: center; margin-bottom: 10px; color: #1a1a2e; font-weight: 700; font-size: 24px; }
+.subtitle { text-align: center; color: #888; margin-bottom: 40px; font-size: 14px; }
+.grid { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
+
+/* Card container */
+.preview-card {
+    width: 440px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    background: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.preview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+/* Label */
+.preview-card .label {
+    text-align: center;
+    padding: 10px;
+    background: #fafafa;
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Modal header */
+.modal-header-preview {
+    padding: 20px 24px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-header-preview h4 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
+.modal-header-preview .close {
+    color: rgba(255,255,255,0.8);
+    font-size: 20px;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.modal-header-preview .close:hover { background: rgba(255,255,255,0.25); }
+
+/* Modal body */
+.modal-body-preview { padding: 20px 24px 24px; }
+
+/* Info box valor/vencimento */
+.info-box {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.info-item {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    background: #f8f9fb;
+    border: 1px solid #eef0f4;
+}
+.info-item small { color: #999; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+.info-item strong { display: block; margin-top: 4px; font-size: 18px; font-weight: 700; }
+
+/* QR area */
+.qr-area {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border: 2px dashed;
+    position: relative;
+}
+.qr-area .badge-pix {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.06);
+}
+.qr-placeholder {
+    width: 150px; height: 150px;
+    background: linear-gradient(135deg, #e8e8e8, #d8d8d8);
+    margin: 0 auto;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* PIX copy */
+.pix-copy {
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    word-break: break-all;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    position: relative;
+}
+.pix-copy:hover { opacity: 0.85; }
+.pix-copy .copy-label {
+    font-weight: 600;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.pix-copy .copy-label i { font-size: 13px; }
+.pix-copy .copy-text { color: #666; line-height: 1.4; }
+
+/* Linha digitavel */
+.linha-dig {
+    background: #fffbf0;
+    border: 1px solid #f0e6cc;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    text-align: center;
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 12px;
+    color: #8a7340;
+    letter-spacing: 0.5px;
+}
+.linha-dig small {
+    color: #b09860;
+    display: block;
+    margin-bottom: 6px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Alert info */
+.alert-info-preview {
+    background: #f0f7ff;
+    border: 1px solid #d4e6f7;
+    color: #3a6d9c;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.alert-info-preview i { font-size: 14px; }
+
+/* Botao */
+.btn-preview {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    transition: opacity 0.2s;
+    letter-spacing: -0.1px;
+}
+.btn-preview:hover { opacity: 0.9; }
+
+/* --- OPCAO 1: Gradiente escuro elegante --- */
+.opt-1 .modal-header-preview { background: linear-gradient(135deg, #1e293b, #334155); }
+.opt-1 .qr-area { border-color: #cbd5e1; background: #f8fafc; }
+.opt-1 .qr-area .badge-pix { color: #475569; }
+.opt-1 .pix-copy { background: #f1f5f9; }
+.opt-1 .pix-copy .copy-label { color: #334155; }
+.opt-1 .info-item strong { color: #1e293b; }
+.opt-1 .btn-preview { background: #1e293b; }
+
+/* --- OPCAO 2: Verde moderno --- */
+.opt-2 .modal-header-preview { background: linear-gradient(135deg, #065f46, #047857); }
+.opt-2 .qr-area { border-color: #a7f3d0; background: #f0fdf4; }
+.opt-2 .qr-area .badge-pix { color: #065f46; }
+.opt-2 .pix-copy { background: #ecfdf5; }
+.opt-2 .pix-copy .copy-label { color: #065f46; }
+.opt-2 .info-item strong { color: #065f46; }
+.opt-2 .btn-preview { background: #059669; }
+
+/* --- OPCAO 3: Azul contemporaneo --- */
+.opt-3 .modal-header-preview { background: linear-gradient(135deg, #1e3a5f, #2563eb); }
+.opt-3 .qr-area { border-color: #bfdbfe; background: #eff6ff; }
+.opt-3 .qr-area .badge-pix { color: #1e40af; }
+.opt-3 .pix-copy { background: #eff6ff; }
+.opt-3 .pix-copy .copy-label { color: #1e40af; }
+.opt-3 .info-item strong { color: #1e3a5f; }
+.opt-3 .btn-preview { background: linear-gradient(135deg, #1e3a5f, #2563eb); }
+
+/* --- OPCAO 4: Roxo sofisticado --- */
+.opt-4 .modal-header-preview { background: linear-gradient(135deg, #4c1d95, #7c3aed); }
+.opt-4 .qr-area { border-color: #ddd6fe; background: #faf5ff; }
+.opt-4 .qr-area .badge-pix { color: #5b21b6; }
+.opt-4 .pix-copy { background: #f5f3ff; }
+.opt-4 .pix-copy .copy-label { color: #5b21b6; }
+.opt-4 .info-item strong { color: #4c1d95; }
+.opt-4 .btn-preview { background: linear-gradient(135deg, #4c1d95, #7c3aed); }
+
+/* --- OPCAO 5: Dark mode --- */
+.opt-5 .preview-card-inner { background: #0f172a; }
+.opt-5 .modal-header-preview { background: #1e293b; border-bottom: 1px solid #334155; }
+.opt-5 .modal-body-preview { background: #0f172a; }
+.opt-5 .info-item { background: #1e293b; border-color: #334155; }
+.opt-5 .info-item small { color: #94a3b8; }
+.opt-5 .info-item strong { color: #f1f5f9; font-size: 18px; }
+.opt-5 .qr-area { border-color: #334155; background: #1e293b; }
+.opt-5 .qr-area .badge-pix { color: #94a3b8; background: rgba(255,255,255,0.08); }
+.opt-5 .qr-placeholder { background: linear-gradient(135deg, #334155, #1e293b); color: #64748b; }
+.opt-5 .pix-copy { background: #1e293b; }
+.opt-5 .pix-copy .copy-label { color: #60a5fa; }
+.opt-5 .pix-copy .copy-text { color: #94a3b8; }
+.opt-5 .linha-dig { background: #1e293b; border-color: #334155; color: #fbbf24; }
+.opt-5 .linha-dig small { color: #94a3b8; }
+.opt-5 .alert-info-preview { background: #172554; border-color: #1e3a5f; color: #93c5fd; }
+.opt-5 .btn-preview { background: #3b82f6; }
+
+/* --- OPCAO 6: Minimal branco --- */
+.opt-6 .modal-header-preview { background: #fff; color: #1a1a2e; border-bottom: 2px solid #e5e7eb; }
+.opt-6 .modal-header-preview .close { color: #999; background: #f3f4f6; }
+.opt-6 .modal-header-preview .close:hover { background: #e5e7eb; }
+.opt-6 .qr-area { border-color: #e5e7eb; background: #fafafa; }
+.opt-6 .qr-area .badge-pix { color: #374151; }
+.opt-6 .pix-copy { background: #f9fafb; border: 1px solid #e5e7eb; }
+.opt-6 .pix-copy .copy-label { color: #111827; }
+.opt-6 .info-item strong { color: #111827; }
+.opt-6 .btn-preview { background: #111827; }
+</style>
+</head>
+<body>
+
+<h2>Modal BoleCode — Design Moderno</h2>
+<p class="subtitle">Escolha o estilo que mais combina com a plataforma</p>
+
+<div class="grid">
+
+  <!-- OPCAO 1: Slate escuro -->
+  <div class="preview-card opt-1">
+    <div class="label">1 — Slate Elegante</div>
+    <div class="modal-header-preview">
+      <h4><i class="fa fa-credit-card" style="margin-right:8px; opacity:0.8;"></i>Pagamento via PIX ou Boleto</h4>
+      <button class="close">&times;</button>
+    </div>
+    <div class="modal-body-preview">
+      <div class="info-box">
+        <div class="info-item"><small>Valor</small><strong>R$ 150,00</strong></div>
+        <div class="info-item"><small>Vencimento</small><strong>30/04/2026</strong></div>
+      </div>
+      <div class="qr-area">
+        <div class="badge-pix"><i class="fa fa-qrcode"></i> Pague via PIX</div>
+        <div class="qr-placeholder">QR Code</div>
+      </div>
+      <div class="pix-copy">
+        <div class="copy-label"><i class="fa fa-copy"></i> PIX Copia e Cola</div>
+        <div class="copy-text">00020126580014br.gov.bcb.pix0136a1b2c3d4...</div>
+      </div>
+      <div class="linha-dig"><small>Linha digitavel</small>34191.79001 01043.510047 91020.150008</div>
+      <div class="alert-info-preview"><i class="fa fa-info-circle"></i> Confirmacao em ate 2 dias uteis.</div>
+      <button class="btn-preview">Visualizar Boleto Completo</button>
+    </div>
+  </div>
+
+  <!-- OPCAO 2: Verde moderno -->
+  <div class="preview-card opt-2">
+    <div class="label">2 — Verde Moderno</div>
+    <div class="modal-header-preview">
+      <h4><i class="fa fa-credit-card" style="margin-right:8px; opacity:0.8;"></i>Pagamento via PIX ou Boleto</h4>
+      <button class="close">&times;</button>
+    </div>
+    <div class="modal-body-preview">
+      <div class="info-box">
+        <div class="info-item"><small>Valor</small><strong>R$ 150,00</strong></div>
+        <div class="info-item"><small>Vencimento</small><strong>30/04/2026</strong></div>
+      </div>
+      <div class="qr-area">
+        <div class="badge-pix"><i class="fa fa-qrcode"></i> Pague via PIX</div>
+        <div class="qr-placeholder">QR Code</div>
+      </div>
+      <div class="pix-copy">
+        <div class="copy-label"><i class="fa fa-copy"></i> PIX Copia e Cola</div>
+        <div class="copy-text">00020126580014br.gov.bcb.pix0136a1b2c3d4...</div>
+      </div>
+      <div class="linha-dig"><small>Linha digitavel</small>34191.79001 01043.510047 91020.150008</div>
+      <div class="alert-info-preview"><i class="fa fa-info-circle"></i> Confirmacao em ate 2 dias uteis.</div>
+      <button class="btn-preview">Visualizar Boleto Completo</button>
+    </div>
+  </div>
+
+  <!-- OPCAO 3: Azul contemporaneo -->
+  <div class="preview-card opt-3">
+    <div class="label">3 — Azul Contemporaneo</div>
+    <div class="modal-header-preview">
+      <h4><i class="fa fa-credit-card" style="margin-right:8px; opacity:0.8;"></i>Pagamento via PIX ou Boleto</h4>
+      <button class="close">&times;</button>
+    </div>
+    <div class="modal-body-preview">
+      <div class="info-box">
+        <div class="info-item"><small>Valor</small><strong>R$ 150,00</strong></div>
+        <div class="info-item"><small>Vencimento</small><strong>30/04/2026</strong></div>
+      </div>
+      <div class="qr-area">
+        <div class="badge-pix"><i class="fa fa-qrcode"></i> Pague via PIX</div>
+        <div class="qr-placeholder">QR Code</div>
+      </div>
+      <div class="pix-copy">
+        <div class="copy-label"><i class="fa fa-copy"></i> PIX Copia e Cola</div>
+        <div class="copy-text">00020126580014br.gov.bcb.pix0136a1b2c3d4...</div>
+      </div>
+      <div class="linha-dig"><small>Linha digitavel</small>34191.79001 01043.510047 91020.150008</div>
+      <div class="alert-info-preview"><i class="fa fa-info-circle"></i> Confirmacao em ate 2 dias uteis.</div>
+      <button class="btn-preview">Visualizar Boleto Completo</button>
+    </div>
+  </div>
+
+  <!-- OPCAO 4: Roxo sofisticado -->
+  <div class="preview-card opt-4">
+    <div class="label">4 — Roxo Sofisticado</div>
+    <div class="modal-header-preview">
+      <h4><i class="fa fa-credit-card" style="margin-right:8px; opacity:0.8;"></i>Pagamento via PIX ou Boleto</h4>
+      <button class="close">&times;</button>
+    </div>
+    <div class="modal-body-preview">
+      <div class="info-box">
+        <div class="info-item"><small>Valor</small><strong>R$ 150,00</strong></div>
+        <div class="info-item"><small>Vencimento</small><strong>30/04/2026</strong></div>
+      </div>
+      <div class="qr-area">
+        <div class="badge-pix"><i class="fa fa-qrcode"></i> Pague via PIX</div>
+        <div class="qr-placeholder">QR Code</div>
+      </div>
+      <div class="pix-copy">
+        <div class="copy-label"><i class="fa fa-copy"></i> PIX Copia e Cola</div>
+        <div class="copy-text">00020126580014br.gov.bcb.pix0136a1b2c3d4...</div>
+      </div>
+      <div class="linha-dig"><small>Linha digitavel</small>34191.79001 01043.510047 91020.150008</div>
+      <div class="alert-info-preview"><i class="fa fa-info-circle"></i> Confirmacao em ate 2 dias uteis.</div>
+      <button class="btn-preview">Visualizar Boleto Completo</button>
+    </div>
+  </div>
+
+  <!-- OPCAO 5: Dark mode -->
+  <div class="preview-card opt-5">
+    <div class="label">5 — Dark Mode</div>
+    <div class="modal-header-preview">
+      <h4><i class="fa fa-credit-card" style="margin-right:8px; opacity:0.8;"></i>Pagamento via PIX ou Boleto</h4>
+      <button class="close">&times;</button>
+    </div>
+    <div class="modal-body-preview">
+      <div class="info-box">
+        <div class="info-item"><small>Valor</small><strong>R$ 150,00</strong></div>
+        <div class="info-item"><small>Vencimento</small><strong>30/04/2026</strong></div>
+      </div>
+      <div class="qr-area">
+        <div class="badge-pix"><i class="fa fa-qrcode"></i> Pague via PIX</div>
+        <div class="qr-placeholder">QR Code</div>
+      </div>
+      <div class="pix-copy">
+        <div class="copy-label"><i class="fa fa-copy"></i> PIX Copia e Cola</div>
+        <div class="copy-text">00020126580014br.gov.bcb.pix0136a1b2c3d4...</div>
+      </div>
+      <div class="linha-dig"><small>Linha digitavel</small>34191.79001 01043.510047 91020.150008</div>
+      <div class="alert-info-preview"><i class="fa fa-info-circle"></i> Confirmacao em ate 2 dias uteis.</div>
+      <button class="btn-preview">Visualizar Boleto Completo</button>
+    </div>
+  </div>
+
+  <!-- OPCAO 6: Minimal branco -->
+  <div class="preview-card opt-6">
+    <div class="label">6 — Minimal Branco</div>
+    <div class="modal-header-preview">
+      <h4><i class="fa fa-credit-card" style="margin-right:8px; opacity:0.6;"></i>Pagamento via PIX ou Boleto</h4>
+      <button class="close">&times;</button>
+    </div>
+    <div class="modal-body-preview">
+      <div class="info-box">
+        <div class="info-item"><small>Valor</small><strong>R$ 150,00</strong></div>
+        <div class="info-item"><small>Vencimento</small><strong>30/04/2026</strong></div>
+      </div>
+      <div class="qr-area">
+        <div class="badge-pix"><i class="fa fa-qrcode"></i> Pague via PIX</div>
+        <div class="qr-placeholder">QR Code</div>
+      </div>
+      <div class="pix-copy">
+        <div class="copy-label"><i class="fa fa-copy"></i> PIX Copia e Cola</div>
+        <div class="copy-text">00020126580014br.gov.bcb.pix0136a1b2c3d4...</div>
+      </div>
+      <div class="linha-dig"><small>Linha digitavel</small>34191.79001 01043.510047 91020.150008</div>
+      <div class="alert-info-preview"><i class="fa fa-info-circle"></i> Confirmacao em ate 2 dias uteis.</div>
+      <button class="btn-preview">Visualizar Boleto Completo</button>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+<?php$dir = dirname(__FILE__);require_once($dir."/../inscricoes/include/config.php");$url = "". WB_URL_VIEW."?content=view/anais/anais_pesquisa.php";header("Location: $url");echo "<a href='".$url."'>redirecionando para Anais do Evento, caso não redirecione clique aqui ...</a>";echo "<HTML><META HTTP-EQUIV=\"REFRESH\" CONTENT=\"0; URL=" . $url . "\"></HTML>";exit();

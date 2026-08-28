@@ -1,0 +1,71 @@
+/**
+ * Adaptações do tema padrão para Bootstrap 5
+ * Carregado DEPOIS do bootstrap-adapt-padrao.css (ou adapt por evento)
+ * somente quando $USAR_BOOTSTRAP_5 = true
+ */
+
+/* Variáveis que faltavam no :root original */
+:root {
+    --a-hover-color: #148C74;
+    --navbar-inverse-color: #148C74;
+}
+
+/* Navbar: BS5 precisa de flex explícito */
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+/* BS5 usa .nav-link em vez de li > a */
+.navbar-inverse .navbar-nav .nav-link {
+    color: #000;
+}
+.navbar-inverse .navbar-nav .nav-link:hover {
+    color: #000;
+}
+
+/* BS5 usa .show em vez de .in (collapse) */
+@media only screen and (max-width: 750px) {
+    .collapse.show {
+        background-color: #e1e1e3;
+    }
+}
+
+/* BS5 usa .show em vez de .open (dropdown) */
+.navbar-inverse .navbar-nav > .show > a,
+.navbar-inverse .navbar-nav > .show > a:focus,
+.navbar-inverse .navbar-nav > .show > a:hover {
+    background-color: #919493;
+}
+
+/* BS5 usa max-width em vez de width nos containers */
+@media (min-width: 768px) {
+    .container {
+        max-width: 750px;
+    }
+}
+@media (min-width: 992px) {
+    .container {
+        max-width: 970px;
+    }
+}
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1170px;
+    }
+}
+
+/* Correção de seletor sem ponto (bug original, inofensivo no BS3 mas quebra no BS5) */
+.navbar-brand {
+    padding: 0px;
+}
+
+/* Correção de seletor inválido (bug original) */
+.btn.btn-primary {
+    color: var(--btn-tx-color);
+    background-color: var(--btn-bg-color);
+    border-color: var(--btn-bd-color);
+}

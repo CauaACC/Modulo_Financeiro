@@ -1,0 +1,114 @@
+<div class="panel">
+                <h4>Verfique se o trabalho atendeu aos requisitos abaixo:</h4>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Ader�ncia ao Eixo Tem�tico? </label>
+                    <select name="criterio_1" id="criterio_1" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='2'>Atendeu Plenamente</option>
+                        <option value='1'>Atendeu Parcialmente</option>
+                        <option value='0'>N�o Atendeu</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Relev�ncia ao Tema? </label>
+                    <select name="criterio_2" id="criterio_2" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='2'>Atendeu Plenamente</option>
+                        <option value='1'>Atendeu Parcialmente</option>
+                        <option value='0'>N�o Atendeu</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <?php if($objTrabalho->getFormatoTexto()=='Relato de Experi�ncia'){ ?>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Caracteriza��o do Problema? </label>
+                    <select name="criterio_3" id="criterio_3" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='2'>Atendeu Plenamente</option>
+                        <option value='1'>Atendeu Parcialmente</option>
+                        <option value='0'>N�o Atendeu</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito" class="col-dm-6">Descri��o da Experi�ncia? </label>
+                    <select name="criterio_4" id="criterio_4" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='2'>Atendeu Plenamente</option>
+                        <option value='1'>Atendeu Parcialmente</option>
+                        <option value='0'>N�o Atendeu</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Efeitos Alcan�ados e Recomenda��es? </label>
+                    <select name="criterio_5" id="criterio_5" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='2'>Atendeu Plenamente</option>
+                        <option value='1'>Atendeu Parcialmente</option>
+                        <option value='0'>N�o Atendeu</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Caráter inovador ou reinvenção da prática de forma a contribuir para a saúde coletiva? </label>
+                        <select name="criterio_6" id="criterio_6" class="form-control col-dm-6" required>
+                            <option value=''></option>
+                            <option value='1'>Sim</option>
+                            <option value='0'>Não</option>
+                        </select>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                <?php }else{ ?>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Clareza dos Objetivos? </label>
+                    <select name="criterio_3" id="criterio_3" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='2'>Atendeu Plenamente</option>
+                        <option value='1'>Atendeu Parcialmente</option>
+                        <option value='0'>N�o Atendeu</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito" class="col-dm-6">Metodologia Adequada? </label>
+                    <select name="criterio_4" id="criterio_4" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='2'>Atendeu Plenamente</option>
+                        <option value='1'>Atendeu Parcialmente</option>
+                        <option value='0'>N�o Atendeu</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Resultados e Discuss�o Relevantes? </label>
+                    <select name="criterio_5" id="criterio_5" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='2'>Atendeu Plenamente</option>
+                        <option value='1'>Atendeu Parcialmente</option>
+                        <option value='0'>N�o Atendeu</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Caráter inovador ou reinvenção da prática de forma a contribuir para a saúde coletiva? </label>
+                        <select name="criterio_6" id="criterio_6" class="form-control col-dm-6" required>
+                            <option value=''></option>
+                            <option value='1'>Sim</option>
+                            <option value='0'>Não</option>
+                        </select>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                <?php } ?>
+
+                <div class="form-group col-dm-12" style="padding-left: 0px;">
+                    <label for="nome_inscrito">Sugerir Altera��o de Eixo Tem�tico? </label>
+                    <select name="alterar_area_tematica"  id="alterar_area_tematica" class="form-control col-dm-6" required>
+                        <option value=''></option>
+                        <option value='0'>N�o</option>
+                        <option value='1'>Sim (vou informar sugest�o de eixo tem�tico no campo justificativa)</option>
+                    </select>
+                    <div class="help-block with-errors"></div>
+                </div>
+            </div>

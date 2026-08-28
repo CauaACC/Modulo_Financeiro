@@ -1,0 +1,86 @@
+Options -Indexes
+
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php74___lsphp .php .php7 .phtml
+</IfModule>
+
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^ping_sessao\.php$ - [L]
+# … suas outras regras (que normalmente mandam tudo pro index.php)
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/transparencia/(.*)$ lib/cursos/transparencia/$3 [QSA,L]
+
+# Permitir acesso direto aos PDFs em /resources/public/hutec/
+RewriteCond %{REQUEST_URI} ^/lib/cursos/inscricoes/resources/public/hutec/ [NC]
+RewriteRule .* - [L]
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)$ lib/cursos/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/$ lib/cursos/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/index.php$ lib/cursos/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/index.php$ lib/cursos/inscricoes/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/index-action.php$ lib/cursos/inscricoes/index-action.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/index-clean.php$ lib/cursos/inscricoes/index-clean.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/index-modal.php$ lib/cursos/inscricoes/index-modal.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes$ lib/cursos/inscricoes/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/$ lib/cursos/inscricoes/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/admin/index.php$ lib/cursos/admin/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/admin$ lib/cursos/admin/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/admin/$ lib/cursos/admin/index.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/admin/(.*)$ lib/cursos/inscricoes/view/admin/$3?rota=$2&prefixo=$1 [QSA,L]
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/certificados/validar/(.*)$ lib/cursos/certificados/validar/$3?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/certificados/validar?(.*)$ lib/cursos/certificados/validar/$3?rota=$2&prefixo=$1 [QSA,L]
+# Canonicaliza: .../certificados/validar  ->  .../certificados/validar/
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/certificados/validar$ $1/$2/certificados/validar/ [R=301,L]
+## Roteia já com barra (funciona com ou sem "resto" depois de validar/)
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/certificados/validar/(.*)$ lib/cursos/certificados/validar/$3?rota=$2&prefixo=$1 [QSA,L]
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/recibos/validar/(.*)$ lib/cursos/recibos/validar/$3?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/declaracao_presenca/validar/(.*)$ lib/cursos/declaracao_presenca/validar/$3?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/carta_aceite/validar/(.*)$ lib/cursos/carta_aceite/validar/$3?rota=$2&prefixo=$1 [QSA,L]
+
+# RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/lib/stream/videoStreamPlay.php$ lib/cursos/inscricoes/lib/stream/videoStreamPlay.php?rota=$2&prefixo=$1 [QSA,L]
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/comprovante_inscricao/validar/(.*)$ lib/cursos/comprovante_inscricao/validar/$3?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/admin/login_acao.php$ lib/cursos/inscricoes/view/admin/login_acao.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/admin/logout_acao.php$ lib/cursos/inscricoes/view/admin/logout_acao.php?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/lib/boleto/imagens/(.*)$ lib/cursos/inscricoes/lib/boleto/imagens/$3 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/resources/(.*)$ lib/cursos/inscricoes/resources/$3 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/certificados/([a-zA-Z0-9_-]+)/modelos/(.*)$ lib/cursos/inscricoes/view/certificados/$3/modelos/$4 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/inscricao/qr-code.php(.*)$ lib/cursos/inscricoes/view/inscricao/qr-code.php$3 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/certificados/modelos/img/ass-coordenador.php(.*)$ lib/cursos/inscricoes/view/certificados/modelos/img/ass-coordenador.php$3?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/certificados/modelos/img/ass-presidente.php(.*)$ lib/cursos/inscricoes/view/certificados/modelos/img/ass-presidente.php$3?rota=$2&prefixo=$1 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/certificados/modelos/img/certificado-frente-unica.php(.*)$ lib/cursos/inscricoes/view/certificados/modelos/img/certificado-frente-unica.php$3?rota=$2&prefixo=$1 [QSA,L]
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/view/avaliacao/(.*)$ lib/cursos/inscricoes/view/avaliacao/$3?rota=$2&prefixo=$1 [QSA,L]
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/([a-zA-Z0-9]+)$ lib/cursos/inscricoes/index.php?content=view/inscricao/inscricao_pagamento.php&rota=$2&prefixo=$1&transacao_id=$3 [QSA,L]
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/inscricoes/info.php$ lib/cursos/inscricoes/info.php [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/carregar/(.*)$ lib/cursos/carregar/$3 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/tests/(.*)$ lib/cursos/tests/$3 [QSA,L]
+
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/anais/(.*)$ lib/cursos/anais/$3 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/hall_virtual/(.*)$ lib/cursos/hall_virtual/$3 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/avaliar_evento/?(.*)$ lib/cursos/avaliar_evento/$3?rota=$2&prefixo=$1 [QSA,L]
+
+#RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/api/(.*)$ lib/cursos/api/$3 [QSA,L]
+RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/api/?(.*)$ lib/cursos/api/router.php?prefixo=$1&rota=$2&content=$3 [QSA,L]
+
+
+## Redirecionar em caso de erros ##
+ErrorDocument 400 /lib/cursos/index.php?content=erro.php&erro=400
+ErrorDocument 403 /lib/cursos/index.php?content=erro.php&erro=403
+ErrorDocument 404 /lib/cursos/index.php?content=erro.php&erro=404
+ErrorDocument 500 /lib/cursos/index.php?content=erro.php&erro=500
+ErrorDocument 501 /lib/cursos/index.php?content=erro.php&erro=501
+ErrorDocument 502 /lib/cursos/index.php?content=erro.php&erro=502
+ErrorDocument 503 /lib/cursos/index.php?content=erro.php&erro=503
+ErrorDocument 504 /lib/cursos/index.php?content=erro.php&erro=504
+ErrorDocument 505 /lib/cursos/index.php?content=erro.php&erro=505

@@ -1,0 +1,62 @@
+<?
+#Montar E-mail
+$FWS_['corpo_email'] = "
+
+<html>
+<head>
+<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1252\">
+<title>Comissão Científica - VII Congresso Nacional Rede Unida</title>
+</head>
+
+<body>
+
+<a href='http://www.redeunida.org.br/congresso/inscricoes/index.php?content=inscricao_trabalhos.php'>
+<font size=\"4\" face=\"Arial\"><h3>
+Comissão Científica - VII Congresso Nacional Rede Unida
+</h3></font>
+</a>
+<br>
+
+<table width=\"740\" border=\"0\"><tr><td>
+<p style=\"text-align:justify\">
+<font size=\"2\" face=\"Arial\">
+
+Prezado(a) Sr(a). <b>".$FWS_['nome_inscrito']."</b>,
+<br>Códido Inscrição: <b>".$FWS_['cod_inscrito']."</b>
+<br>Códido Trabalho: <b>".$FWS_['cod_trabalho']."</b>
+
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Agradecemos o envio do seu resumo para o nosso Congresso.
+</font>
+
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Informamos que seu trabalho,
+<b>".$FWS_['titulo_trabalho']."</b>
+, encontra-se em avaliação e o parecer será encaminhado até 29 de maio de 2006.
+<br><br.
+Informações mais detalhadas serão enviadas na mesma data.
+<br><br>
+</font>
+
+<p style=\"text-align:justify\">
+<font size=\"2\" face=\"Arial\">
+Em caso de dúvidas, favor entrar em contato com a secretaria do congresso através do e-mail: <u><a href=\"mailto:7congresso@uol.com.br\">7congresso@uol.com.br</a></u>.<br>
+
+</font>
+<p style=\"text-align:justify\"><font size=\"2\" face=\"Arial\">
+Atenciosamente,
+</font>
+<p><font size=\"2\" face=\"Arial\">
+Izabel Cristina Meister Coelho Lemos<br>
+Coordenadora da Comissão Científica
+</font></b>
+</td></tr></table>
+</body>
+</html>
+";
+
+#If($FWS_Debug==1){ echo  $FWS_['corpo_email']."<br><br>"; }
+
+?>

@@ -1,0 +1,924 @@
+<?php
+require_once(dirname(__FILE__)."/../../include/config.php");
+#require_once(dirname(__FILE__)."/../../include/inscricao_request_variaveis.php");
+
+if ($objPerfil->getVerificarEnvioTrabalho()==1){
+    #Fazendo conexão com o banco
+    $Conexao_db = FWA_Conexao("OpcTec");
+    
+    /*$FWS_Numero_Maximo_Trabalhos esta definido no config.php*/
+    if($FWS_Numero_Maximo_Trabalhos_Atrelado_ao_Perfil){
+        switch ($objInscrito->getCodPerfil()) {
+            case 1:
+            case 3:
+            case 5:
+                $FWS_Numero_Maximo_Trabalhos = 2;
+                break;
+            case 2:
+            case 4:
+            case 6:
+                $FWS_Numero_Maximo_Trabalhos = 1;
+                break;
+            default:
+                $FWS_Numero_Maximo_Trabalhos = 1;
+                break;
+        }   
+    }
+    if ($objInscrito->getCodInscrito() == '4751' or $objInscrito->getCodInscrito() == '4597') {
+        $FWS_Numero_Maximo_Trabalhos = 3;
+    }
+    if ($objPerfil->getVerificarEnvioTrabalho()) {
+        $FWS_Numero_Maximo_Trabalhos = $objEvConf->getTrabSubmissaoQtd();
+    }
+    if($FWS_Numero_Maximo_Trabalhos == 0){
+        echo "<br>Perfil de inscrição não permite envio de anexos";
+    }else{
+        /** Tratando as mensagem e avisos da área de trabalho */
+        $mostrarMsgTrabahoTexto = true;
+        if(($objInscrito->getTotalTrabalhos()>=1) and ($objEvConf->getMsgTrabalhoAposAnexarOcultar()==true)){
+            $mostrarMsgTrabahoTexto = false;
+        }
+        if($objInscrito->getStatusProcesso()=='PARTICIPANDO'){
+            $mostrarMsgTrabahoTexto = false;
+        }
+        if($objInscrito->getStatusProcesso()=='DESISTENTE'){ 
+            $mostrarMsgTrabahoTexto = false;
+        }
+        if($objEvConf->getMsgTrabalhoAtivar()==true){
+            if ($mostrarMsgTrabahoTexto==true){
+                echo $objEvConf->getMsgTrabalhoTexto();
+            }
+        }else{    
+            if(!$objEvConf->getMsgTrabalhoPadraoOcultar()==true){
+                // echo "<br>Sua inscrição lhe permite enviar: " . $FWS_Numero_Maximo_Trabalhos . " ".strtolower($objEvConf->getDescTrabAnexoTipo());
+                //                if(!in_array($objEv->getCodEvento(), array(37,38,46))){
+                //                    echo "<br>Até o momento você enviou: " . $objInscrito->getTotalTrabalhos() . "  ". strtolower($objEvConf->getDescTrabAnexoTipo());
+                //                }
+            }
+        }
+        /* Modelo do resumo: arquivo enviado na configuracao do evento (local de
+         * midia MODELO-DO-RESUMO). Aparece logo abaixo da mensagem da area do
+         * trabalho, antes do botao de anexar. */
+        if (GerenciarMidiaUploadAC::localizarModeloResumo()) {
+            echo "<div style='margin:12px 0;'>"
+               . "<a href=\"javascript:void(0);\" onclick=\"document.baixarModeloResumo.submit();\">"
+               . "<i class='fa fa-download'></i> Baixar o modelo para o resumo</a>"
+               . "</div>";
+        }
+        if(($objInscrito->getTotalTrabalhos()>=1) and ($objEvConf->getMsgTrabalhoAposAnexarAtivar()==true and $objInscrito->getStatusProcesso()=='INSCRITO')){
+            echo $objEvConf->getMsgTrabalhoAposAnexarTexto();
+        }
+        /*@todo aqui é preciso criar campo para decidir se avaliação será por individuo ou por trabalho*/
+        if($objEvConf->getTrabAvaliacaoDivulgar()==true){
+           
+            if ($objEvConf->getTrabAvaliacaoPermitirRecurso()==1){
+                if($objEvConf->getMsgTrabalhoRecursoAtivar()==true){
+                    echo $objEvConf->getMsgTrabalhoRecursoTexto();
+                }
+            }
+            /**@todo Avaliação de Inscrito, nem todo projeto tem avaliação por inscrito, portanto
+             * é preciso criar uma lógica para lidar com isso.
+             */
+            try {
+                $objAvalInsc = new AvaliacaoInscrito();
+                $objAvalInsc->setCodEvento($objInscrito->getCodEvento());
+                $objAvalInsc->setCodInscrito($objInscrito->getCodInscrito());
+                $objAvalInsc->carregarListaAvaliacaoInscritoByIdInscrito();
+                foreach ($objAvalInsc->getListaAvaliacaoInscrito() as $objLAI){
+                    if($objEvConf->getCodEvento()==106){
+                        echo "<br>";
+                        echo "<br><b><span style='text-size:15px;margin-top:5px;'>"
+                        . "Paracer Referente a Solicitação de Inpugnação:</span></b>";
+                        echo "<br>";
+                        echo $objLAI->getParecerAvaliador();
+                    }else{ 
+                        
+                    echo "<br>";
+                    echo "<br><b><span style='text-size:15px;margin-top:5px;'>"
+                        . "Paracer da 1º Fase da Avaliação:</span></b>";
+                    echo "<br>";
+//                    echo "<br>Documentação: ".$objLAI->getDescSitArquivo();
+                    if($objLAI->getClassificacaoStatus()=='H' or $objLAI->getClassificacaoStatus()=='I'){
+                        if($objLAI->getSitPontos()!=''){
+                           echo "<br><b>Pontuação na Avaliação Pré-liminar: " .$objLAI->getSitPontos()." pontos</b>";
+                        }
+                        if($objLAI->getPontosTotalConfirmado()!=''){
+                           echo "<br><b>Pontuação Avaliação Final: " .$objLAI->getPontosTotalConfirmado()." pontos</b>";
+                        }
+//                        echo "<br>Pontuação: ".$objLAI->getDescSitPontos();
+                    }
+//                    else{
+//                        echo "<br>Pontuação informada pelo candidato: ".$objLAI->getDescSitPontos();
+//                    }
+
+//                    if($objLAI->getDescSitArquivo()=='NÃO anexada'
+//                    or $objLAI->getDescSitPontos()=='não informada'
+//                    or $objLAI->getSitPontos()=='0')
+//                    {
+//                        $objLAI->setClassificacaoStatus('I');
+//                    }
+                    if ($objLAI->getClassificacaoStatus()=='H'){
+                        echo "<br>Colocação: ";
+                        if(is_int($objLAI->getClassificacao())){
+                            echo $objLAI->getClassificacao();
+                        }else{
+                            /*Situação por falta de documentação*/
+                            echo $objLAI->getClassificacao();
+                        }
+                    }
+
+                    echo "<br>Situação da Classificação:. ";
+                        if($objLAI->getClassificacaoStatus()=='H'){
+                            echo "<span style='text-size:14px;color:green;'>Habilitada/Lista de espera</span>";
+//                            $OP_SUBMISSAO_TRABALHO_ENCERRADA = true;
+                            $permitirRecurso = true;
+
+                        }
+                        if($objLAI->getClassificacaoStatus()=='I'){
+                            echo "<span style='text-size:14px;color:red;'>Não Habilitada</span>";
+                            $permitirRecurso = true;
+                        }
+//                        if($objLAI->getClassificacaoStatus()=='V'){
+//                            echo "<span style='text-size:14px;color:red;'>Averiguando</span>";
+//                            $permitirRecurso = true;
+//                        }
+                        if($objLAI->getClassificacaoStatus()==''){
+                            echo "<span style='text-size:14px;color:red;'>Não Habilitado</span>";
+                            $permitirRecurso = true;
+                        }
+//                        echo "<br>
+//                          <br><b>Atenção:</b> A habilitação, agora no momento atendeu apenas ao número de vagas indicados no edital.
+//                          <br>Sendo assim, consta como habilitados os que tiveram notas mais altas e que pela ordem ficaram dentro da quantidade de vagas.";
+                    }
+                }
+            } catch (Exception $exc) {
+                if(!$objEvConf->getMsgTrabalhoPadraoOcultar()==true){
+                    echo $exc->getMessage();
+                }
+            }
+
+            if ($objEvConf->getTrabAvaliacaoPermitirRecurso() == 1) {
+                if ($objInscrito->getTotalTrabalhos() < $FWS_Numero_Maximo_Trabalhos) {
+                    If ($OP_PERMITIR_SOLICITAR_RECURSO == true) {
+                        if ($recurso_trabalho_solicitar == 1) {
+                            echo "<span style='text-size:15px;color:green'>Pedido de Recurso já Registrado!</span><br>";
+                        } else {
+                            echo "
+                            <br><br>
+                            <FORM NAME='exit' METHOD='POST' ACTION='index.php?content=view/inscricao/inscricao_trabalhos_cadastro_dados_trabalho.php'>
+                                <button class=\"btn btn-xs btn-primary \" type=\"submit\">
+                                 " . $objEvConf->getTxtBtnSolicitarRecurso() . ".</button>
+                            </FORM><hr style='border:1;width:100%'>
+                            ";
+                        }
+                    }
+                }
+            }
+        }
+ 
+        If ($OP_SUBMISSAO_TRABALHO) {
+            if (!$objEvConf->getMsgTrabalhoPadraoOcultar()) {
+                if($objEvConf->getTrabSubmissãoDataDataFim()!=''){
+                    if($objEv->getCodEvento()!=37 and $objEv->getCodEvento()!=38){
+                        echo "<br><font color='red'>Envio de ".strtolower($objEvConf->getDescTrabAnexoTipo())." se encerrará dia: " . formatDateView($objEvConf->getTrabSubmissãoDataDataFim()) . "</font>";;
+                    }
+                }
+                if (!$OP_SUBMISSAO_TRABALHO_ENCERRADA){
+                    if($objEv->getCodEvento()!=37 and $objEv->getCodEvento()!=38 and $objEv->getCodEvento()!=46){
+                        if($objEvConf->getTrabPermitirBtnEditar() and $objInscrito->getStatusProcesso()=='INSCRITO'){
+                            echo "<br><font color='red'>";
+                            if($objEvConf->getTrabPermitirBtnEditar() and $objEvConf->getTrabPermitirBtnExcluir()){
+                                echo "Edite ou exclua";
+                            }else{
+                                echo "Edite";
+                            }
+                            echo " seu ".strtolower($objEvConf->getDescTrabAnexoTipo())." enquanto o mesmo não estiver em processo de avaliação</font>";
+                        }
+                    }
+                }
+            }
+        }
+        if ( $OP_SUBMISSAO_TRABALHO_AGUARDANDO ){
+            echo "<br><font color='red'>";
+            echo "<br>Liberação para envio de ".strtolower($objEvConf->getDescTrabAnexoTipo())." prevista para dia ";
+            echo formatDateView($FWS_Data_Ini_Submissao_Trabalho) . "";
+//            echo "e finalizar dia " . formatDateView($FWS_Data_Max_Submissao_Trabalho);
+            echo "</font>";
+        }
+        if ($OP_SUBMISSAO_TRABALHO_ENCERRADA){
+            if($objEv->getCodEvento()!=37 and $objEv->getCodEvento()!=38 and $objEv->getCodEvento()!=50 and $objEv->getCodEvento()!=44 and $objEv->getCodEvento()!=42){
+                if(!$objEvConf->getMsgTrabalhoPadraoOcultar()==true){
+                    echo "<br><font color='red'>";
+                    echo "<br>Envio de ".strtolower($objEvConf->getDescTrabAnexoTipo())." encerrado dia: ";
+                    echo formatDateView($FWS_Data_Max_Submissao_Trabalho) . "";
+                    //echo "e finalizar dia " . formatDateView($FWS_Data_Max_Submissao_Trabalho);
+                    echo "</font>";
+                }
+            }
+            if($objEvConf->getApresentacaoAnexar()==true){
+                if($objEvConf->getApresentacaoAnexarDatFim()!=''){
+                    echo "<br><font color='red'>";
+                    echo "<br>Envio de poster para apresentação até dia: ".formatDateView($objEvConf->getApresentacaoAnexarDatFim());
+                    echo "</font>";
+                }
+            }
+            if($objEvConf->getAvulsoAnexar()){ 
+                if($flg_indicado_comissao==1){
+                    include('inscricao_trabalhos_anexar_avulso.php');
+                }
+            }#$OP_ANEXAR_AVULSO             
+}
+
+
+        if($objInscrito->getTotalTrabalhos() < $FWS_Numero_Maximo_Trabalhos){
+//            echo '->'.$OP_SUBMISSAO_TRABALHO.' and '.$OP_SUBMISSAO_TRABALHO_ENCERRADA.'<-';
+            If ($OP_SUBMISSAO_TRABALHO and $OP_SUBMISSAO_TRABALHO_ENCERRADA!=true) {
+                if($objEvConf->getTrabPermitirBtnEnviar()==true or $objEvConf->getTrabResumoFormulario()==true){
+                    $totalEnviados = $objInscrito->getTotalTrabalhos();
+                    $restantes = $FWS_Numero_Maximo_Trabalhos - $totalEnviados;
+                    echo "
+                    <br><br>
+                    <FORM NAME='exit' METHOD='POST' ACTION='index.php?content=view/inscricao/inscricao_trabalhos_cadastro_dados_trabalho.php'>
+                        <button class=\"btn btn-sm btn-primary\" style=\"padding:8px 20px; font-size:14px;\" type=\"submit\">
+                        ".$objEvConf->getTxtBtnEnviarTrabalho()." (".$totalEnviados." de ".$FWS_Numero_Maximo_Trabalhos.")</button>
+                    </FORM><hr style='border:1;width:100%'>
+                    ";
+                }
+            }
+        }
+        #-----------------------------------------------------------------------------------------
+        #Definindo comando SQL
+        $var_sql = "
+                SELECT t.cod_trabalho
+               ,t.cod_area_tematica
+               ,t.titulo_trabalho
+               ,t.autor_apresentador_nome
+               ,oat.titulo
+               ,t.flg_enviado_avaliacao
+               ,t.arquivo_upload
+               ,t.arquivo_gerado
+               ,t.nome_co_autor_1
+               ,t.nome_co_autor_2
+               ,t.nome_co_autor_3
+               ,t.nome_co_autor_4
+               ,t.nome_co_autor_5
+               ,t.nome_co_autor_6
+               ,t.resumo_trabalho
+               ,t.flg_indicado_comissao
+               ,es.*
+               ,t.pontos_total
+               ,t.recurso_trabalho_solicitar
+               ,t.nome_co_autor_7
+               ,t.nome_co_autor_8
+               ,t.tipo_documento
+               ,t.periodo_referencia
+               ,t.flg_permitir_alterar
+               ,t.flg_permitir_alterar_data_fim
+               ,t.arquivo_identificado_upload
+               ,t.arquivo_identificado_gerado               
+             FROM tab_trabalhos as t
+             left join tab_opcoes_areas_tematicas as oat on (t.cod_area_tematica = oat.cod_area_tematica)
+             inner join tab_inscritos as ti on (t.cod_inscrito      = ti.cod_inscrito)
+             left join tab_ensalamento_trabalho_sessao ets on ets.cod_trabalho=t.cod_trabalho
+             left join vw_ensalamento_sessao es on es.cod_sessao=ets.cod_sessao
+             WHERE
+                 (t.cod_evento  = " . COD_EVENTO . ")
+             and (t.status      = 'ATIVADA')
+             and (IFNULL(t.tipo_documento,'') <> 'COMPROVANTE_PERFIL')
+             and (ti.cod_inscrito = '" . $_SESSION['_cod_inscrito'] . "')
+             and (ti.status     = 'ATIVADA')
+             ORDER BY cod_trabalho DESC
+            ";
+
+        #Executando a consulta no banco SQL
+        $RS = $Conexao_db->Execute($var_sql);
+
+        #Verificando se houve retorno de algum registro
+        If (!$RS->EOF) {#Se nao ha trabahos submetidos
+            #Definindo cabeçalho da tabela dos resultados da consula
+            #Efetuando loop para o visualização dos registros retornados pela consulta SQL
+            echo "<table border='0'>";
+            $ii=0;
+            $imprimirScript=1;
+            While (!$RS->EOF) {
+                $liberarBotaoEditar = false;
+                #Adicionando nas variaveis, os valores dos campos retirados dos registros
+                $cod_trabalho = $RS->fields[0];
+                $cod_area_tematica = $RS->fields[1];
+                $titulo_trabalho = $RS->fields[2];
+                $autor_apresentador_nome = $RS->fields[3];
+                $titulo_area_tematica = textoMaiusculoMinusculo($RS->fields[4]);
+                $flg_enviado_avaliacao = $RS->fields[5];
+                $arquivo_upload = $RS->fields[6];
+                $arquivo_gerado = $RS->fields[7];
+
+                $arquivo_identificado_upload = $RS->fields['arquivo_identificado_upload'];
+                $arquivo_identificado_gerado = $RS->fields['arquivo_identificado_gerado'];
+                
+                $nome_co_autor_1  = $RS->fields[8];
+                $nome_co_autor_2  = $RS->fields[9];
+                $nome_co_autor_3  = $RS->fields[10];
+                $nome_co_autor_4  = $RS->fields[11];
+                $nome_co_autor_5  = $RS->fields[12];
+                $nome_co_autor_6  = $RS->fields[13];
+                $resumo_trabalho  = $RS->fields[14];
+                $nome_co_autor_7  = $RS->fields['nome_co_autor_7'];
+                $nome_co_autor_8  = $RS->fields['nome_co_autor_8'];
+                $flg_indicado_comissao  = $RS->fields['flg_indicado_comissao'];
+                
+                $nome_bloco = $RS->fields['nome_bloco'];
+                $nome_sala  = $RS->fields['nome_sala'];
+                $data       = $RS->fields['data'];
+                $hora_ini   = formatTimeView($RS->fields['hora_ini']);
+                $turno  = $RS->fields['turno'];
+                $pontos_total  = $RS->fields['pontos_total'];
+                $recurso_trabalho_solicitar  = $RS->fields['recurso_trabalho_solicitar'];
+                $tipo_documento  = $RS->fields['tipo_documento'];
+                $periodo_referencia  = $RS->fields['periodo_referencia'];
+                $flg_permitir_alterar  = $RS->fields['flg_permitir_alterar'];
+                $flg_permitir_alterar_data_fim  = $RS->fields['flg_permitir_alterar_data_fim'];
+                
+                $coautores = "";
+                $coautores .= $nome_co_autor_1? $nome_co_autor_1."<br>" : "";
+                $coautores .= $nome_co_autor_2? $nome_co_autor_2."<br>" : "";
+                $coautores .= $nome_co_autor_3? $nome_co_autor_3."<br>" : "";
+                $coautores .= $nome_co_autor_4? $nome_co_autor_4."<br>" : "";
+                $coautores .= $nome_co_autor_5? $nome_co_autor_5."<br>" : "";
+                $coautores .= $nome_co_autor_6? $nome_co_autor_6."<br>" : "";
+                $coautores .= $nome_co_autor_7? $nome_co_autor_7."<br>" : "";
+                $coautores .= $nome_co_autor_8? $nome_co_autor_8."<br>" : "";
+
+                echo ($ii>=0? "<tr valign='top'><td colspan='2'>&nbsp;</td></tr>" : "");
+                $ii++;
+                echo "<tr valign='top'><td colspan=2><hr style='border:1px solid #acacac !important;'></td></tr>";
+                if($tipo_documento!=''){
+                    echo "<tr valign='top'><td width='130' colspan='2'>Cód. Documento: <b>{$cod_trabalho }</b></td></tr>";
+                }else{
+                    echo "<tr valign='top'><td width='130' colspan='2'>Cód. ".$objEvConf->getDescTrabAnexoTipo().": <b>{$cod_trabalho }</b></td></tr>";
+                }
+                
+                //echo $titulo_area_tematica? "<tr valign='top'><td>Eixo Temático: </td><td> <b>{$titulo_area_tematica }</b></td></tr>" : "";
+                if($objEvConf->getCodEvento()==46 or $objEvConf->getCodEvento()==69){
+//                    echo "<tr valign='top'><td colspan='2'>Data Hora Consulta: <b>".."</b></td></tr>";
+                    echo "<tr valign='top'><td colspan='2'>Soma de pontos informados por você durante seu cadastro: <b>{$pontos_total} pts</b></td></tr>";
+
+                }else if($objEvConf->getCodEvento()==37 or $objEvConf->getCodEvento()==38){
+                    echo "<tr valign='top'><td colspan='2'>Total de Pontos Informados: <b>{$pontos_total} pts</b></td></tr>";
+
+                }else if($objEvConf->getTrabAnexoTipo()=='Termo de Concessão de Bolsa'){
+//                    echo "<tr valign='top'><td colspan='2'>Total de Pontos Informados: <b>{$pontos_total} pts</b></td></tr>";
+
+                }else if($objEvConf->getTrabAnexoTipo()=='Documentos' or $objEvConf->getTrabAnexoTipo()=='Documento'){
+//                    echo "<tr valign='top'><td colspan='2'>Total de Pontos Informados: <b>{$pontos_total} pts</b></td></tr>";
+
+                }else if($objEvConf->getTrabAnexoTipo()=='Trabalho' 
+                      or $objEvConf->getTrabAnexoTipo()=='Resumo'
+                      or $objEvConf->getTrabAnexoTipo()=='Musica'){
+
+                        echo $titulo_trabalho? "<tr valign='top'><td colspan='2'>Titulo: <b>{$titulo_trabalho }</b></td></tr>" : "";
+                        if($objEvConf->getCodEvento()==70){
+                            echo "<tr valign='top'><td >Apresentador: </td><td> <b>{$autor_apresentador_nome}</b></td></tr>";
+                        }else{
+                            echo "<tr valign='top'><td >Apresentador: </td><td> <b>{$objInscrito->getNomeInscrito() }</b></td></tr>";
+                        }
+                        echo $coautores? "<tr valign='top'><td>Co-autores: </td><td> {$coautores }</td></tr>" : "";
+                        
+                }        
+                echo "<tr valign='top'><td colspan='2' style='padding-top:10px;'>";
+                if(TRABALHO_ANEXA_RESUMO){
+                    if($arquivo_gerado){
+                        // echo "Arquivo anexado: ";
+                        //echo "<br>Arquivo anexado: ".$arquivo_upload;
+        //                echo "<br>Arquivo Gravado: ".$arquivo_gerado;
+                        //if($_SERVER['REMOTE_ADDR']=='189.90.70.56'){
+                        if($objEvConf->getTrabPermitirBtnVisualizar()==1){
+                            echo "<a href=\"javascript: visualiza('{$arquivo_gerado}');\"  title='Visualizar ".$objEvConf->getDescTrabAnexoTipo()."' style='color:green;'>";
+                            retornarIconeExtensao($arquivo_gerado);
+                            if($tipo_documento!=''){
+                                echo "Visualizar Arquivo ".$tipo_documento."</a>";
+                            }else{
+                                echo "Visualizar Arquivo ".$objEvConf->getDescTrabAnexoTipo()."</a>";
+                            }
+                            echo $periodo_referencia!=''? " - ref. ".$periodo_referencia : "";
+                            echo "<br><br>";
+                        }else{ 
+                            // echo "Visualização bloqueada";
+                        }
+                        //}
+                    }else{
+                        if ($objEvConf->getTrabAvaliacaoPermitirRecurso()==1){
+                            //echo "<br><font color=red>Arquivo do ".strtolower($objEvConf->getDescTrabAnexoTipo())." não anexado.</font>";
+                        }else{
+                            echo "<br><font color=red>Falta anexar o arquivo do ".strtolower($objEvConf->getDescTrabAnexoTipo()).".</font><br>";
+                        }
+                    } 
+                    /** @todo anexar arquivo identificado, controle de liberação não esta funcinando */
+                    if (in_array($objEvConf->getCodEvento(), [70, 103])) {
+                        if($arquivo_identificado_gerado){
+                            // echo "arquivo_identificado anexado: ";
+                            //echo "<br>arquivo_identificado anexado: ".$arquivo_identificado_upload;
+            //                echo "<br>arquivo_identificado Gravado: ".$arquivo_identificado_gerado;
+                            //if($_SERVER['REMOTE_ADDR']=='189.90.70.56'){
+                            if($objEvConf->getTrabPermitirBtnVisualizar()==1){
+                                echo "<a href=\"javascript: visualiza('{$arquivo_identificado_gerado}');\"  title='Visualizar ".$objEvConf->getDescTrabAnexoTipo()."' style='color:green;'>";
+                                retornarIconeExtensao($arquivo_identificado_gerado);
+                                if($tipo_documento!=''){
+                                    echo "Visualizar Arquivo Identificado ".$tipo_documento."</a>";
+                                }else{
+                                    echo "Visualizar Arquivo Identificado ".$objEvConf->getDescTrabAnexoTipo()."</a>";
+                                }
+                                echo $periodo_referencia!=''? " - ref. ".$periodo_referencia : "";
+                                echo "<br><br>";
+                            }else{ 
+                                // echo "Visualização bloqueada";
+                            }
+                            //}
+                        }else{
+                            if ($objEvConf->getTrabAvaliacaoPermitirRecurso()==1){
+                                //echo "<br><font color=red>arquivo_identificado do ".strtolower($objEvConf->getDescTrabAnexoTipo())." não anexado.</font>";
+                            }else{
+                                echo "<br><font color=red>Falta anexar o arquivo_identificado do ".strtolower($objEvConf->getDescTrabAnexoTipo()).".</font>";
+                            }
+                        } 
+                    } 
+                }else{
+                    if($resumo_trabalho){
+                        ?>
+                        <a class="hidden" id="btnOcultarResumo-<?php echo $cod_trabalho ?>" title="Ocultar Resumo"
+                           href='javascript:void(0);' onclick="javascript:ocultarResumo(<?php echo  $cod_trabalho ?>);">
+                            <b>Ocultar Texto </b><img src='<?php echo  WB_URL_IMG ?>/bull3_breeze.gif' alt='Ocultar Resumo' border='0' width="15px"></a>     
+                        <a class="show" id="btnVisualizarResumo-<?php echo $cod_trabalho ?>" title="Visualizar Texto"
+                           href="javascript:void(0);" onclick="javascript:visualizarResumo(<?php echo  $cod_trabalho ?>);">
+                           <b>Visualizar Texto </b><img src='<?php echo  WB_URL_IMG ?>/abre.gif' alt='Visualizar Texto' border='0' width="15px"></a>  
+                        
+                        <p align='justify' class='hidden' id='resumo-<?php echo $cod_trabalho;?>'><?php echo $resumo_trabalho;?></p>
+                        <?php
+                    }
+                }
+                echo "</td></tr>";
+
+                //if($_SERVER['REMOTE_ADDR']=='189.90.70.56'){
+                    if ($objEvConf->getTrabPermitirBtnEditar()and $objInscrito->getStatusProcesso()=='INSCRITO'){
+                            $liberarBotaoEditar  = $objEvConf->getTrabPermitirBtnEditar();
+                    }
+                    $configExcluir = intval($objEvConf->getTrabPermitirBtnExcluir()); // 0=Não, 1=Sim até avaliação, 2=Sim mesmo em avaliação
+                    $liberarBotaoExcluir = 0;
+                    if ($configExcluir > 0 and $objInscrito->getStatusProcesso()=='INSCRITO'){
+                        $liberarBotaoExcluir = 1;
+                    }
+                    if ($OP_SUBMISSAO_TRABALHO_ENCERRADA==true){
+                        $liberarBotaoExcluir = 0;
+                        $liberarBotaoEditar  = 0;
+                    }
+                    $trabalhoEmTramitacao = false;
+                    echo "<tr><td colspan=2>";
+                    //echo "<b>Detalhes do ultimo parecer:</b><br>";
+                    try {
+                        $objHistoricoAvaliacao = new HistoricoAvaliacao();
+                        $objHistoricoAvaliacao->setCodTrabalho($cod_trabalho);
+                        $objHistoricoAvaliacao->setCodInscrito($cod_inscrito);
+                        $objHistoricoAvaliacao->carregarUltimaAvaliacaoByIdTrabalho($debug);
+                        if($objHistoricoAvaliacao->getAvaliacao()!=''){
+//                            
+                            ($objHistoricoAvaliacao->getAvaliacao()=='APROVADO')?  $colorMsg = "green" : $colorMsg = "red";
+                            if($objHistoricoAvaliacao->getAvaliacao()=='APROVADO' AND $objEvConf->getTrabAvaliacaoDivulgar()){
+                                
+                                echo "<font color=".$colorMsg.">Parabéns, seu resumo foi <b>".$objHistoricoAvaliacao->getAvaliacao()."</b></font></font>";
+                                if($flg_indicado_comissao==1){
+                                    echo " <font color=".$colorMsg.">e <b>INDICADO PARA PREMIAÇÃO</b></font>";
+                                }
+                                echo "<br>";
+                                ?>
+                        
+                                <?php if($OP_DIVULGAR_ENSALAMENTO){ ?>
+                                    <font color=<?php echo $colorMsg?>><br>
+                                        <span style="font-size: 20px;font-weight: bold;">
+                                            Local de apresentação:
+                                        </span><br>
+                                        <?php echo $nome_bloco?> Sala: <?php echo $nome_sala?>
+                                        <br>Data: <?php echo  formatDateView($data)?> - Horário: <?php echo $hora_ini?> - Turno: <?php echo $turno?>
+                                    </font>
+                                <?php }else{ ?>
+                                    
+<!--                                    <font color=<?php echo $colorMsg?>>
+                                    <br>Em breve divulgaremos neste local, mais informações sobre apresentação.
+                                    </font>-->
+                                    
+                                   
+<!--                                    <font color=<?php echo $colorMsg?>>
+                                    <br>Local de apresentação:
+                                    <br>EXPOSIÇÃO EM PLATAFORMA DIGITAL
+                                    <br>14 e 16 /07/2022
+                                    <br>
+                                    </font>-->
+                                    
+
+                                <?php } ?>
+                                        
+                                        
+                                <?php 
+//                                if($flg_indicado_comissao==1){
+//                                   $OP_ANEXAR_APRESENTACAO=false;  
+//                                   $OP_PERMITIR_ANEXAR_APRESENTACAO = 1;
+//                                   $OP_PERMITIR_ANEXAR_VIDEO = 1;
+//                                }
+                                if($OP_ANEXAR_APRESENTACAO){ 
+                                    include('inscricao_trabalhos_anexar_apresentacao.php');
+                                }#$OP_ANEXAR_APRESENTACAO 
+                                $apresentacaoAnexada = 1;
+                                if($objEvConf->getAvulsoAnexar()){ 
+                                    if($flg_indicado_comissao==1 or $objEvConf->getAvulsoAnexarQuem()=='pago_aprovado' or $objEvConf->getAvulsoAnexarQuem()=='aprovado'){
+                                        include('inscricao_trabalhos_anexar_avulso.php');
+                                    }
+                                }#$OP_ANEXAR_AVULSO 
+                                ?>
+                                <?php 
+                                if($OP_ANEXAR_VIDEO){ 
+                                    if($flg_indicado_comissao==1){
+                                        include('inscricao_trabalhos_anexar_video.php');
+                                    }
+                                }#$OP_ANEXAR_VIDEO 
+                                ?>
+                       
+                                <?php
+//                                echo "<font color=".$colorMsg."><br><a href='http://congressosaudepublica.org.br/suplemento_cientifico.pdf' target='_blank'>Clique aqui para localizar o horário de sua apresentação </a>.</b></font>";
+                                
+                            }else if ($objHistoricoAvaliacao->getAvaliacao()=='REPROVADO' AND $objEvConf->getTrabAvaliacaoDivulgar()){
+                                echo "<font color=".$colorMsg.">"
+                                        . "Agradecemos pela submissão do seu ".strtolower($objEvConf->getDescTrabAnexoTipo())."."
+                                        . "<br>Sentimos muito em anunciar que esse ".strtolower($objEvConf->getDescTrabAnexoTipo())." foi considerado 'NÃO APROVADO' para o evento."
+                                    . "</font>";
+//                                echo "<font color=green><b> - AGUARDANDO REVISÃO.</b></font>";
+                            }else{
+                                if ($objHistoricoAvaliacao->getAvaliacao()=='DEVOLVIDO'){
+                                    echo "<font color=".$colorMsg."><b>Ajuste seu ".strtolower($objEvConf->getDescTrabAnexoTipo())." e o envie novamente para Avaliação.</b></font>";
+                                    $ultimoStatusAvaliacao = $objHistoricoAvaliacao->getAvaliacao();
+                                }else{
+                                    echo "<font color=green><b> - AGUARDANDO AVALIAÇÃO.</b></font>";
+                                }
+                            }
+                            
+                            if($objHistoricoAvaliacao->getAvaliacao()=='DEVOLVIDO'){
+                                $liberarBotaoEditar  = 1;
+                                $trabalhoEmTramitacao = true;
+                                //echo "<br><font color=".$colorMsg."><b>Ajuste seu resumo e o envie novamente para Avaliação.</b></font>";
+                            }
+                            if($objHistoricoAvaliacao->getAvaliacao()=='SUBMETIDO'){
+                                if($objHistoricoAvaliacao->getCodAvaliador() != ''){
+                                    $liberarBotaoEditar = 0;
+                                    $trabalhoEmTramitacao = true;
+                                }else{
+                                    $liberarBotaoEditar = 1;
+                                }
+                            }
+                            if($objHistoricoAvaliacao->getAvaliacao()=='RE-SUBMETIDO'){
+                                if($objHistoricoAvaliacao->getCodAvaliador() != ''){
+                                    $liberarBotaoEditar = 0;
+                                    $trabalhoEmTramitacao = true;
+                                }else{
+                                    $liberarBotaoEditar = 1;
+                                }
+                            }
+                            if($objHistoricoAvaliacao->getAvaliacao()=='REPROVADO'){
+                                $liberarBotaoEditar = 0;
+                                $trabalhoEmTramitacao = true;
+                            }
+                            if($objHistoricoAvaliacao->getAvaliacao()=='APROVADO'){
+                                $liberarBotaoEditar = 0;
+                                $trabalhoEmTramitacao = true;
+                            }
+                            if($objHistoricoAvaliacao->getAvaliacao()=='SELECIONADO'){
+                                $liberarBotaoEditar = 0;
+                                $trabalhoEmTramitacao = true;
+                                //echo "<font color=".$colorMsg."><b> - EM AVALIAÇÃO.</b></font>";
+                            }
+                            // Controle do botão excluir baseado em tramitação
+                            if($trabalhoEmTramitacao){
+                                if($configExcluir == 2){
+                                    $liberarBotaoExcluir = 1; // permite, mas view exigirá justificativa
+                                }else{
+                                    $liberarBotaoExcluir = 0; // bloqueia (config=0 ou config=1)
+                                }
+                            }
+                            if($objHistoricoAvaliacao->getObservacao()!=''){
+                                //echo "<br><b>PARECER DO AVALIADOR:</b><br>".$objHistoricoAvaliacao->getObservacao();
+                            }
+                        }else{
+                            if($flg_enviado_avaliacao){
+                                echo "<font color=".$colorMsg."><b> - AGUARDANDO AVALIAÇÃO..</b></font>";
+                            }
+                            /* Se não possui avaliação ativada, então 
+                             * não é permitido editar ou excluir após submissão
+                             */
+//                            $liberarBotaoEditar = 1;
+                        }
+                        if($objEvConf->getTrabAvaliacaoMostrarHistorico() or (COD_EVENTO==103 and $ultimoStatusAvaliacao=='DEVOLVIDO')){
+                            $objHistoricoAvaliacao->carregarListaAvaliacoesByIdTrabalho($debug);
+                            foreach ($objHistoricoAvaliacao->getListaAvaliacoes() as $objLHA) {
+                                /**@TODO VERIFICAR SE MELHOR FICAR ASSIM MESMO */
+                                if ($ultimoStatusAvaliacao=='DEVOLVIDO'){ 
+                                    //echo "<br>".$objLHA->getAvaliacao();
+                                    if ($objLHA->getAvaliacao() and $objLHA->getObservacao()!=''){
+                                        echo "<br>Parecer:<br>";
+                                        echo $objLHA->getObservacao()."<br>";
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception $exc) {
+                        echo $exc->getMessage();
+                    }
+                    echo "</td></tr>";
+                //}
+                //if($flg_enviado_avaliacao){
+    //            if(!$liberarBotaoEditar){
+    //                if($cod_trabalho=='32'){
+    //                    echo "<tr valign='top'><td colspan='2'><font color=green>Parabéns, seu resumo foi Aprovado</font></td></tr>";
+    //                }else{
+    //                    echo "<tr valign='top'><td colspan='2'>";
+    //                    //echo "<font color=red>Enviado para Avaliação</font>";
+    //                        $objAvaliacao = new TrabalhoAvaliacao();
+    //                        $objAvaliacao->setCodInscrito($objInscrito->getCodInscrito());
+    //                        $objAvaliacao->setCodTrabalho($cod_trabalho);
+    //                        $objAvaliacao->getTrabalhoAvaliacaoById($debug);
+    //                        if($cod_inscrito=='1023'){
+    //                            echo "<font color=red>Enviado para Avaliação</font>";
+    //                        }else{
+    //                            if($objAvaliacao->getAvaliacao()=='APROVADO'){
+    //                                echo "<font color=green>Resumo Aprovado</font>";
+    //                            }else if($objAvaliacao->getAvaliacao()=='REPROVADO'){
+    //                                echo "<font color=red>Resumo Reprovado</font>";
+    //                            }else{
+    //                                echo "<font color=red>Enviado para Avaliação</font>";
+    //                            }
+    //                        }
+    //                    //}
+    //                    echo "</td></tr>";
+    //                }
+    //            }else{
+                if ($objEvConf->getTrabAvaliacaoPermitirRecurso()==1){
+                    // if($recurso_trabalho_solicitar==1){
+                    //     echo "<br><span style='text-size:15px;color:green'>Pedido de Recurso já Registrado!</span><br>";
+                    // }
+                    // If ($OP_PERMITIR_SOLICITAR_RECURSO == true) {
+                    //     echo "<br><a href='index.php?content=view/inscricao/inscricao_trabalhos_cadastro_dados_trabalho.php&cod_trabalho=".$cod_trabalho."'
+                    //     class='btn btn-xs btn-primary' role='button'>".$objEvConf->getTxtBtnSolicitarRecurso()." </a>
+                    //     &nbsp;&nbsp;&nbsp;"; 
+                    // }
+                    
+                }
+                /** @todo inserir campo no formulário de edição de arquivo para permitir que um inscrito especifico possa fazer alteraçoes em seus arquivos sem que isso afete a regra geral aplicada a outros inscritos*/
+                // if($cod_trabalho==6733 or $cod_trabalho==6734){
+                //     $liberarBotaoEditar = 1;
+                // }
+                if($flg_permitir_alterar==1){
+                    $liberarBotaoEditar = true;
+                }
+                // Botões de ação: excluir pode aparecer independente do editar
+                if($liberarBotaoEditar || $liberarBotaoExcluir){
+                    echo "<tr valign='top'><td colspan='2'>";
+//                  if ($objEvConf->getTrabAvaliacaoPermitirRecurso()==1){
+                    if($recurso_trabalho_solicitar==1){
+                        echo "<span style='text-size:15px;color:green'>Recurso já Solicitado!</span><br>";
+                    }
+//                  }
+                    if($liberarBotaoExcluir == 1){
+                        if($trabalhoEmTramitacao){
+                            echo "
+                            <button type='button' class='btn btn-xs btn-danger' data-toggle='modal' data-target='#modalExcluirTrabalho-".$cod_trabalho."'>Excluir</button>
+                            &nbsp;&nbsp;";
+                        }else{
+                            echo "
+                            <button type='button' class='btn btn-xs btn-primary' data-toggle='modal' data-target='#modalExcluirTrabalho-".$cod_trabalho."'>Excluir</button>
+                            &nbsp;&nbsp;";
+                        }
+                    }
+                    if($liberarBotaoEditar){
+//                    if($OP_TRAMITACAO_TRABALHO){
+                        if(TRABALHO_ANEXA_RESUMO){
+                            echo "
+                            <a href='index.php?content=view/inscricao/inscricao_trabalhos_cadastro_dados_trabalho.php&cod_trabalho=".$cod_trabalho."'
+                            class='btn btn-xs btn-primary' role='button'>".$objEvConf->getTxtBtnEditarTrabalho()." ...</a>
+                            &nbsp;&nbsp;&nbsp;";
+                        }else{
+                            echo "
+                            <a href='index.php?content=view/inscricao/inscricao_trabalhos_cadastro_dados_trabalho.php&cod_trabalho=".$cod_trabalho."'
+                            class='btn btn-xs btn-primary' role='button'>Editar</a>
+                            &nbsp;&nbsp;&nbsp;";
+                        }
+        //                if($arquivo_gerado){
+                            if($objEvConf->getTrabAvaliacao()){
+                                if(!$OP_AVALIACAO_ENVIAR_AO_SALVAR){
+                                echo "
+                                <a href='index.php?content=view/inscricao/inscricao_trabalhos_avaliacao_enviar.php&acao=Avaliar&cod_trabalho=".$cod_trabalho."'
+                                    class='btn btn-xs btn-primary' role='button'>Enviar para Avaliação</a>
+                                ";
+                                }
+                            }
+        //                }
+                    }
+                    echo "</td></tr>";
+                    if($liberarBotaoEditar){
+                        if($OP_TRAMITACAO_TRABALHO){
+                            if(!$OP_AVALIACAO_ENVIAR_AO_SALVAR){
+            //                echo "<br><font color=red>Anexe o arquivo do trabalho, para liberar o botão de envio para avaliação.</font>";
+                                echo "<tr valign='top'><td colspan='2'>
+                                <br><font color=red><b>Atenção:</b></font>
+                                <br>Não esqueça de enviar seu ".strtolower($objEvConf->getDescTrabAnexoTipo())." para avaliação.
+                                </td></tr>";
+                            }
+                        }
+                    }
+                }   
+
+                if($OP_ANEXAR_CONTRATO){
+                    echo "<tr><td colspan=2>";
+                    include('inscricao_trabalhos_anexar_contrato.php');
+                    echo "</td></tr>"; 
+                }
+                // if($OP_ANEXAR_RPA){
+                //     echo "<tr><td colspan=2>";
+                //     include('inscricao_trabalhos_anexar_rpa.php');
+                //     echo "</td></tr>"; 
+                // }
+                // if($OP_ANEXAR_BOLETO){
+                //     echo "<tr><td colspan=2>";
+                //     include('inscricao_trabalhos_anexar_boleto.php');
+                //     echo "</td></tr>"; 
+                // }
+
+                if($liberarBotaoExcluir == 1){
+                    $modalHeaderBg = $trabalhoEmTramitacao ? '#d9534f' : '#337ab7';
+                    $modalTitulo = $trabalhoEmTramitacao ? 'Excluir trabalho em tramitação' : 'Confirmar exclusão';
+                    $modalBtnClass = $trabalhoEmTramitacao ? 'btn-danger' : 'btn-primary';
+                    $modalEmTramitacaoJs = $trabalhoEmTramitacao ? 'true' : 'false';
+                    echo '
+                    <div class="modal fade" id="modalExcluirTrabalho-'.$cod_trabalho.'" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header" style="background-color:'.$modalHeaderBg.'; color:#fff;">
+                                    <button type="button" class="close" data-dismiss="modal" style="color:#fff;opacity:1;">&times;</button>
+                                    <h4 class="modal-title">'.$modalTitulo.'</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Código: <b>'.$cod_trabalho.'</b></p>';
+                    if($titulo_trabalho){
+                        echo '<p>Título: <b>'.$titulo_trabalho.'</b></p>';
+                    }
+                    if($trabalhoEmTramitacao){
+                        echo '
+                                    <div class="alert alert-warning">
+                                        Este trabalho está em processo de avaliação
+                                        ('.$objHistoricoAvaliacao->getAvaliacao().').
+                                        A exclusão irá desativá-lo. Informe a justificativa abaixo.
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="justificativaExcluir-'.$cod_trabalho.'">Justificativa <span style="color:red;">*</span></label>
+                                        <textarea class="form-control" id="justificativaExcluir-'.$cod_trabalho.'" rows="3" placeholder="Informe o motivo da exclusão..."></textarea>
+                                    </div>';
+                    }else{
+                        echo '
+                                    <p>Deseja realmente excluir este '.strtolower($objEvConf->getDescTrabAnexoTipo()).'?</p>';
+                    }
+                    echo '
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn '.$modalBtnClass.'"
+                                        onclick="desativarTrabalho('.$cod_trabalho.', '.$modalEmTramitacaoJs.')">
+                                        Confirmar Exclusão
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>';
+                }
+
+                #Movendo para o proximo registro
+                $RS->MoveNext();
+            }
+            echo "<tr valign='top'><td colspan='2'>&nbsp;</td></tr></table>";
+        }
+    }
+    ?>
+    <form name="baixarModeloResumo" method="post" action="<?php echo WB_URL_COMMAND?>" target="_blank">
+        <input type="hidden" name="c" value="GerenciarMidiaUpload">
+        <input type="hidden" name="m" value="baixarModeloResumo">
+    </form>
+    <form name="getdocumento" method="post" action="<?php echo WB_URL_COMMAND?>" target="_blank">
+        <input type="hidden" name="c" value="GerenciarUpload">
+        <input type="hidden" name="m" value="abrirDocumento">
+        <input type="hidden" value="" name="cod">
+    </form>
+    <form name="getavulso" method="post" action="<?php echo WB_URL_COMMAND?>" target="_blank">
+        <input type="hidden" name="c" value="GerenciarUpload">
+        <input type="hidden" name="m" value="abrirAvulso">
+        <input type="hidden" value="" name="cod">
+    </form>
+    <form name="getcontrato" method="post" action="<?php echo WB_URL_COMMAND?>" target="_blank">
+        <input type="hidden" name="c" value="GerenciarUpload">
+        <input type="hidden" name="m" value="abrirContrato">
+        <input type="hidden" value="" name="cod">
+    </form>
+    <form name="getvideo" method="post" action="<?php echo WB_URL_COMMAND?>" target="_blank">
+        <input type="hidden" name="c" value="GerenciarUpload">
+        <input type="hidden" name="m" value="abrirVideo">
+        <input type="hidden" value="" name="cod">
+    </form>
+    <form name="getdoc" method="post" action="<?php echo WB_URL_COMMAND?>" target="_blank">
+        <input type="hidden" name="c" value="GerenciarUpload">
+        <input type="hidden" name="m" value="abrirWord">
+        <input type="hidden" value="" name="cod">
+    </form>
+    <SCRIPT LANGUAGE="JavaScript1.2" src="resources/js/avaliacao-trabalhos.js"></SCRIPT>
+    <script language="JavaScript" type="text/javascript">
+        function visualiza(cod){
+            document.getdoc.cod.value=cod;
+            document.getdoc.submit();
+        }
+        function visualizarDocumento(cod){
+            document.getdocumento.cod.value=cod;
+            document.getdocumento.submit();
+        }
+        function visualizarAvulso(cod){
+            document.getavulso.cod.value=cod;
+            document.getavulso.submit();
+        }
+        function visualizarContrato(cod){
+            document.getcontrato.cod.value=cod;
+            document.getcontrato.submit();
+        }
+        function visualizarVideo(cod){
+            document.getvideo.cod.value=cod;
+            document.getvideo.submit();
+        }
+        function ocultarResumo(cod_resumo){
+            loading('#resumo-'+cod_resumo,'hidden')
+            loading('#btnVisualizarResumo-'+cod_resumo,'show')
+            loading('#btnOcultarResumo-'+cod_resumo,'hidden')
+        }
+        function visualizarResumo(cod_resumo){
+            loading('#resumo-'+cod_resumo,'show')
+            loading('#btnVisualizarResumo-'+cod_resumo,'hidden')
+            loading('#btnOcultarResumo-'+cod_resumo,'show')
+        }
+        function criticarAnexoApresentacao(cod_trabalho){
+            if($('#arquivo-'+cod_trabalho).val()==''){
+                alert('É necessário anexar arquivo da apresentação.');
+                return false;
+            }
+        }
+        function criticarAnexoVideo(cod_trabalho){
+            if($('#arquivo-video-'+cod_trabalho).val()==''){
+                alert('É necessário anexar arquivo de video.');
+                return false;
+            }
+        }
+        function desativarTrabalho(codTrabalho, emTramitacao){
+            var justificativa = '';
+            if(emTramitacao){
+                justificativa = $('#justificativaExcluir-'+codTrabalho).val().trim();
+                if(justificativa === ''){
+                    $('#justificativaExcluir-'+codTrabalho).css('border-color','red');
+                    $('#justificativaExcluir-'+codTrabalho).focus();
+                    return false;
+                }
+            }
+            var btnConfirmar = $('#modalExcluirTrabalho-'+codTrabalho+' .modal-footer .btn-danger, #modalExcluirTrabalho-'+codTrabalho+' .modal-footer .btn-primary');
+            btnConfirmar.prop('disabled', true).text('Processando...');
+
+            $.ajax({
+                url: '<?php echo WB_URL_COMMAND ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    c: 'GerenciarInscricao',
+                    m: 'desativarTrabalho',
+                    cod_trabalho: codTrabalho,
+                    justificativa: justificativa
+                },
+                success: function(data){
+                    if(data.statusMessage == '1'){
+                        $('#modalExcluirTrabalho-'+codTrabalho).modal('hide');
+                        location.reload();
+                    }else{
+                        btnConfirmar.prop('disabled', false).text('Confirmar Exclusão');
+                        $('#modalExcluirTrabalho-'+codTrabalho+' .modal-body').prepend(
+                            '<div class="alert alert-danger alert-dismissible">'
+                            +'<button type="button" class="close" data-dismiss="alert">&times;</button>'
+                            + data.message + '</div>'
+                        );
+                    }
+                },
+                error: function(){
+                    btnConfirmar.prop('disabled', false).text('Confirmar Exclusão');
+                    $('#modalExcluirTrabalho-'+codTrabalho+' .modal-body').prepend(
+                        '<div class="alert alert-danger alert-dismissible">'
+                        +'<button type="button" class="close" data-dismiss="alert">&times;</button>'
+                        +'Erro ao processar a solicitação.</div>'
+                    );
+                }
+            });
+        }
+    </script>
+<?php }?>

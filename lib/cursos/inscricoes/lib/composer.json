@@ -1,0 +1,23 @@
+{
+    "name": "opctec/opctec-eventos",
+    "description": "Gestor de eventos e cursos",
+    "keywords": ["eventos"],
+    "homepage": "http://www.opctec.com.br",
+    "authors": [
+        {
+            "name": "OPCTEC"
+        }
+    ],
+    "require": {
+        "firebase/php-jwt": "*",
+        "phpmailer/phpmailer": "^6.1",
+        "sendgrid/sendgrid": "^8.1",
+        "composer/ca-bundle": "^1.5",
+        "mpdf/mpdf": "*",
+        "setasign/fpdi": "^2.6",
+        "fpdf/fpdf": "^1.86",
+        "iio/libmergepdf": "^4.0",
+        "twilio/sdk": "^8.4",
+        "phpoffice/phpword": "^1.4"
+    }
+}

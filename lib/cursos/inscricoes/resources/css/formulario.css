@@ -1,0 +1,121 @@
+principal-conteudo2{
+    font-size: 11px;
+}
+#principal-conteudo1{
+    min-width: 600px;
+    float: none;
+    margin: 30px 10px 0 170px;
+}
+fieldset{
+    font-size: 11px;
+    line-height: 20px;
+    padding: 5px;
+}
+fieldset legend{
+    font-size: 11px;
+    font-weight: bold;
+}
+form ul
+{
+    list-style-type:none;
+    margin-bottom: 2px;
+    padding:0;
+    width:100%;
+}
+form li
+{
+    margin:2px;
+    padding:4px 5px 2px 9px;
+}
+form label
+{
+    float:left;
+    text-align: right;
+    margin:2px;
+}
+textarea.textarea
+{
+    width:400px;
+    font-size: 11px;
+}
+#tabs ul li label{
+    text-align: left;
+}
+#tabs{
+    font-size: 11px;
+    padding-bottom: 20px;
+}
+#listObjetivos {
+    display: block;
+    margin-left: 110px;
+}
+.listObjetivos {
+    display: block;
+    margin-left: 110px;
+}
+th{
+    font-size: 11px;
+}
+#destaque{
+    background-color: #E0E6D3;
+}
+.labelTituloProposta{
+    font-size: 11px;
+    font-weight: bold;
+    height: 30px;
+    background-color: #CCCCCC;
+    font-family: Verdana;
+} 
+
+.labelTitulo{
+    font-size: 11px;
+    font-weight: bold;
+    height: 30px;
+    font-family: Verdana;
+} 
+.labelSubTitulo{
+    font-size: 11px;
+    font-weight: bold;
+    height: 20px;
+    background-color: #DDDDDD;
+    font-family: Verdana;
+} 
+.label{
+    font-family: Verdana;
+    font-size: 11px;
+    -font-weight: bold;
+    height: 20px;
+    vertical-align: top;
+}    
+.labelLeft{
+    font-family: Verdana;
+    font-size: 11px;
+    -font-weight: bold;    
+    text-align: left;
+}
+.labelRigth{
+    font-family: Verdana;
+    font-size: 11px;
+    -font-weight: bold;    
+    text-align: right;
+}
+.obs{
+    font-size: 10px;
+    font-weight: normal;
+}
+.ui-datepicker {
+     width: 18em;
+}
+ui-datepicker-trigger{
+     width: 12px;
+     vertical-align: middle;
+}
+/*aba simples*/
+#tabs {
+    font-size: 11px;
+    padding-bottom: 0;
+}
+.ui-tabs {
+    padding: -0.8em;
+    margin-left: -4px;
+}

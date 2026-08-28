@@ -1,0 +1,833 @@
+/**
+ * Bootstrap 3 → 5 Compatibility Layer (v2)
+ * Maps Bootstrap 3 classes to Bootstrap 5 equivalents.
+ * Load AFTER Bootstrap 5 CSS.
+ */
+
+/* ============================================================
+   CRITICAL: .hidden / .show visibility classes
+   BS3 had .hidden { display: none !important }
+   BS5 removed it. The app uses .hidden/.show extensively
+   via addClass/removeClass in default.js loading() function.
+   ============================================================ */
+.hidden {
+    display: none !important;
+}
+
+/* ============================================================
+   PANELS → CARDS
+   ============================================================ */
+.panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.panel-default {
+    border-color: #dee2e6;
+}
+
+.panel-heading {
+    padding: 0.5rem 1rem;
+    margin-bottom: 0;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 5px 5px 0 0;
+}
+
+.panel-body {
+    flex: 1 1 auto;
+    padding: 0 1rem 1rem 1rem;
+}
+
+.panel-footer {
+    padding: 0.5rem 1rem;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0 0 5px 5px;
+}
+
+.panel-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1rem;
+    color: inherit;
+}
+
+.panel-title > a,
+.panel-title > small,
+.panel-title > .small,
+.panel-title > small > a,
+.panel-title > .small > a {
+    color: inherit;
+}
+
+/* Panel contextual variants */
+.panel-primary {
+    border-color: #0d6efd;
+}
+.panel-primary > .panel-heading {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.panel-success {
+    border-color: #198754;
+}
+.panel-success > .panel-heading {
+    color: #fff;
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.panel-info {
+    border-color: #0dcaf0;
+}
+.panel-info > .panel-heading {
+    color: #000;
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+}
+
+.panel-warning {
+    border-color: #ffc107;
+}
+.panel-warning > .panel-heading {
+    color: #000;
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.panel-danger {
+    border-color: #dc3545;
+}
+.panel-danger > .panel-heading {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Panel group (accordion) */
+.panel-group {
+    margin-bottom: 1.25rem;
+}
+.panel-group .panel {
+    margin-bottom: 8px;
+    border-radius: 6px;
+}
+.panel-group .panel + .panel {
+    margin-top: 8px;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-default {
+    color: #212529;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+.btn-default:hover,
+.btn-default:focus,
+.btn-default:active,
+.btn-default.active {
+    color: #212529;
+    background-color: #e2e6ea;
+    border-color: #dae0e5;
+}
+
+/* btn-xs: removed in BS4/5 - recreate (456 occurrences!) */
+.btn-xs {
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
+.btn-group-xs > .btn {
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
+
+/* ============================================================
+   CLOSE BUTTON (BS3 .close → BS5 .btn-close)
+   Recreate the BS3 .close style so existing markup works
+   ============================================================ */
+button.close,
+.close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    appearance: none;
+    cursor: pointer;
+}
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    opacity: .75;
+}
+
+/* ============================================================
+   GRID: Restore BS3 float-based grid behavior.
+   In BS3, col-* classes used float:left and worked anywhere.
+   In BS5, col-* use flex and only work inside .row.
+   This app has ~121 files using col-* OUTSIDE .row, so we
+   restore float:left. Inside .row (flex), float is ignored.
+   ============================================================ */
+[class*="col-sm-"],
+[class*="col-md-"],
+[class*="col-lg-"],
+[class*="col-xs-"],
+[class*="col-dm-"] {
+    float: left;
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    box-sizing: border-box;
+}
+
+/* Inside .row, BS5 flex takes over — reset the float padding
+   because BS5 uses --bs-gutter-x instead */
+.row > [class*="col-"] {
+    float: none;
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    padding-left: calc(var(--bs-gutter-x) * .5);
+}
+
+/* Clearfix for any element containing floated col-* children */
+.form-group::after,
+.panel-body::after,
+.footer-box-wrap::after,
+fieldset::after,
+.form-signin::after,
+.cnslt-padrao::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* col-xs-* (removed in BS4/5 — restore as non-breakpoint cols) */
+.col-xs-1  { width: 8.333333%; }
+.col-xs-2  { width: 16.666667%; }
+.col-xs-3  { width: 25%; }
+.col-xs-4  { width: 33.333333%; }
+.col-xs-5  { width: 41.666667%; }
+.col-xs-6  { width: 50%; }
+.col-xs-7  { width: 58.333333%; }
+.col-xs-8  { width: 66.666667%; }
+.col-xs-9  { width: 75%; }
+.col-xs-10 { width: 83.333333%; }
+.col-xs-11 { width: 91.666667%; }
+.col-xs-12 { width: 100%; }
+
+/* col-dm-* (custom classes used in this app — treat as col-md-*) */
+.col-dm-1  { width: 8.333333%; }
+.col-dm-2  { width: 16.666667%; }
+.col-dm-3  { width: 25%; }
+.col-dm-4  { width: 33.333333%; }
+.col-dm-5  { width: 41.666667%; }
+.col-dm-6  { width: 50%; }
+.col-dm-7  { width: 58.333333%; }
+.col-dm-8  { width: 66.666667%; }
+.col-dm-9  { width: 75%; }
+.col-dm-10 { width: 83.333333%; }
+.col-dm-11 { width: 91.666667%; }
+.col-dm-12 { width: 100%; }
+
+/* col-xs offset */
+.col-xs-offset-0  { margin-left: 0; }
+.col-xs-offset-1  { margin-left: 8.333333%; }
+.col-xs-offset-2  { margin-left: 16.666667%; }
+.col-xs-offset-3  { margin-left: 25%; }
+.col-xs-offset-4  { margin-left: 33.333333%; }
+.col-xs-offset-5  { margin-left: 41.666667%; }
+.col-xs-offset-6  { margin-left: 50%; }
+.col-xs-offset-7  { margin-left: 58.333333%; }
+.col-xs-offset-8  { margin-left: 66.666667%; }
+.col-xs-offset-9  { margin-left: 75%; }
+.col-xs-offset-10 { margin-left: 83.333333%; }
+.col-xs-offset-11 { margin-left: 91.666667%; }
+
+/* ============================================================
+   LABELS → BADGES
+   ============================================================ */
+.label:not(label) {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.375rem;
+}
+
+.label-default { background-color: #6c757d; }
+.label-primary { background-color: #0d6efd; }
+.label-success { background-color: #198754; }
+.label-info    { background-color: #0dcaf0; color: #000; }
+.label-warning { background-color: #ffc107; color: #000; }
+.label-danger  { background-color: #dc3545; }
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+.pull-left  { float: left !important; }
+.pull-right { float: right !important; }
+.center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.img-responsive {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+.img-circle  { border-radius: 50% !important; }
+.img-rounded { border-radius: 0.375rem !important; }
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.table-condensed th,
+.table-condensed td {
+    padding: 0.25rem 0.5rem;
+}
+
+/* ============================================================
+   NAVBAR COMPAT
+   BS5 changed navbar significantly. This restores BS3 behavior.
+   ============================================================ */
+
+/* Override BS5 navbar defaults to match BS3 look */
+.navbar {
+    font-size: 14px;
+    min-height: 50px;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+/* BS5 .navbar > .container uses flex. Keep it but ensure
+   proper wrapping for BS3-style navbar-header + navbar-collapse */
+.navbar > .container,
+.navbar > .container-fluid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* .navbar-inverse: restore BS3 behavior over BS5 */
+.navbar-inverse {
+    --bs-navbar-color: rgba(255, 255, 255, 0.55);
+    --bs-navbar-hover-color: rgba(255, 255, 255, 0.75);
+    --bs-navbar-disabled-color: rgba(255, 255, 255, 0.25);
+    --bs-navbar-active-color: #fff;
+    --bs-navbar-brand-color: #fff;
+    --bs-navbar-brand-hover-color: #fff;
+    --bs-navbar-toggler-border-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-fixed-top {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+}
+
+.navbar-fixed-bottom {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+}
+
+/* .navbar-header (BS3 container for brand + toggle) */
+.navbar-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Navbar toggle (hamburger) - map BS3 .navbar-toggle to work */
+.navbar-toggle {
+    position: relative;
+    float: right;
+    padding: 9px 10px;
+    margin-right: 15px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.navbar-toggle .icon-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 1px;
+    background-color: #888;
+}
+.navbar-toggle .icon-bar + .icon-bar {
+    margin-top: 4px;
+}
+@media (min-width: 768px) {
+    .navbar-toggle { display: none; }
+}
+@media (max-width: 767.98px) {
+    .navbar-toggle { display: block; }
+}
+
+/* .navbar-collapse: make it work with BS5 collapse */
+.navbar-collapse {
+    flex-basis: 100%;
+    flex-grow: 1;
+    align-items: center;
+}
+@media (max-width: 767.98px) {
+    .navbar-collapse {
+        display: none;
+    }
+    .navbar-collapse.in,
+    .navbar-collapse.show {
+        display: block !important;
+    }
+}
+
+/* BS3 .navbar-nav dropdown positioning */
+.navbar-nav .dropdown-menu {
+    position: absolute;
+}
+
+/* BS3 .nav > li > a — restore font size and padding */
+.navbar-nav > li {
+    position: relative;
+    display: block;
+}
+.navbar-nav > li > a {
+    display: block;
+    padding: 10px 15px;
+    font-size: 14px;
+    line-height: 20px;
+    text-decoration: none;
+    color: inherit;
+}
+.navbar-nav > li > a:hover,
+.navbar-nav > li > a:focus {
+    text-decoration: none;
+}
+
+/* BS3 .nav > li > a (general nav) */
+.nav > li > a {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+}
+
+/* Dropdown items inside navbar */
+.navbar-nav .dropdown-menu > li > a {
+    font-size: 14px;
+    line-height: 20px;
+    padding: 5px 20px;
+}
+
+/* ============================================================
+   DROPDOWN COMPAT
+   BS5 needs .dropdown-item on <a> tags inside .dropdown-menu.
+   Since existing markup uses <li><a>, we style it via CSS too.
+   ============================================================ */
+.dropdown-menu > li > a {
+    display: block;
+    padding: 0.25rem 1rem;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+}
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    color: #1e2125;
+    background-color: #e9ecef;
+}
+
+/* .caret was removed in BS5 */
+.caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: 4px dashed;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+/* .divider → .dropdown-divider in BS5 */
+.divider,
+li.divider {
+    height: 0;
+    margin: 0.5rem 0;
+    overflow: hidden;
+    border-top: 1px solid #dee2e6;
+}
+
+/* .dropdown-header inside <li> */
+li.dropdown-header {
+    display: block;
+    padding: 0.25rem 1rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   HIDDEN / VISIBLE (responsive)
+   ============================================================ */
+@media (max-width: 575.98px) {
+    .hidden-xs { display: none !important; }
+}
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .hidden-sm { display: none !important; }
+}
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .hidden-md { display: none !important; }
+}
+@media (min-width: 992px) {
+    .hidden-lg { display: none !important; }
+}
+
+.visible-xs, .visible-sm, .visible-md, .visible-lg {
+    display: none !important;
+}
+@media (max-width: 575.98px) {
+    .visible-xs { display: block !important; }
+}
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .visible-sm { display: block !important; }
+}
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .visible-md { display: block !important; }
+}
+@media (min-width: 992px) {
+    .visible-lg { display: block !important; }
+}
+
+/* ============================================================
+   WELL → removed in BS5
+   ============================================================ */
+.well {
+    min-height: 20px;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    border-radius: 0.375rem;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.well-lg { padding: 24px; border-radius: 0.5rem; }
+.well-sm { padding: 9px; border-radius: 0.25rem; }
+
+/* ============================================================
+   GLYPHICONS → Font Awesome 4 mapping
+   ============================================================ */
+.glyphicon {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.glyphicon::before { content: ""; }
+
+.glyphicon-calendar::before     { content: "\f073"; }
+.glyphicon-eye-open::before     { content: "\f06e"; }
+.glyphicon-folder-open::before  { content: "\f07c"; }
+.glyphicon-list::before         { content: "\f03a"; }
+.glyphicon-pencil::before       { content: "\f040"; }
+.glyphicon-trash::before        { content: "\f1f8"; }
+.glyphicon-bell::before         { content: "\f0f3"; }
+.glyphicon-book::before         { content: "\f02d"; }
+.glyphicon-usd::before          { content: "\f155"; }
+.glyphicon-education::before    { content: "\f19d"; }
+.glyphicon-arrow-left::before   { content: "\f060"; }
+.glyphicon-cog::before          { content: "\f013"; }
+.glyphicon-plus::before         { content: "\f067"; }
+.glyphicon-search::before       { content: "\f002"; }
+.glyphicon-user::before         { content: "\f007"; }
+.glyphicon-info-sign::before    { content: "\f05a"; }
+.glyphicon-ok::before           { content: "\f00c"; }
+.glyphicon-lock::before         { content: "\f023"; }
+.glyphicon-remove::before       { content: "\f00d"; }
+.glyphicon-chevron-right::before { content: "\f054"; }
+.glyphicon-chevron-left::before  { content: "\f053"; }
+.glyphicon-chevron-down::before  { content: "\f078"; }
+.glyphicon-chevron-up::before    { content: "\f077"; }
+.glyphicon-home::before         { content: "\f015"; }
+.glyphicon-envelope::before     { content: "\f003"; }
+.glyphicon-download::before     { content: "\f019"; }
+.glyphicon-upload::before       { content: "\f093"; }
+.glyphicon-print::before        { content: "\f02f"; }
+.glyphicon-refresh::before      { content: "\f021"; }
+.glyphicon-star::before         { content: "\f005"; }
+.glyphicon-star-empty::before   { content: "\f006"; }
+.glyphicon-heart::before        { content: "\f004"; }
+.glyphicon-time::before         { content: "\f017"; }
+.glyphicon-file::before         { content: "\f15b"; }
+.glyphicon-picture::before      { content: "\f03e"; }
+.glyphicon-map-marker::before   { content: "\f041"; }
+.glyphicon-phone::before        { content: "\f095"; }
+.glyphicon-certificate::before  { content: "\f0a3"; }
+.glyphicon-exclamation-sign::before { content: "\f06a"; }
+.glyphicon-warning-sign::before     { content: "\f071"; }
+
+/* ============================================================
+   FORM COMPAT
+   ============================================================ */
+
+/* .form-group (removed in BS5, replaced by mb-3) */
+.form-group {
+    margin-bottom: 8px;
+}
+
+/* .form-horizontal — make col-* inside .form-group work */
+.form-horizontal .form-group {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+/* .form-inline — recreate with flexbox */
+.form-inline {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+.form-inline .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+}
+.form-inline .form-group {
+    display: flex;
+    flex: 0 0 auto;
+    flex-flow: row wrap;
+    align-items: center;
+    margin-bottom: 0;
+}
+.form-inline .input-group {
+    width: auto;
+}
+
+/* .control-label → .form-label in BS5 */
+.control-label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* .help-block → .form-text in BS5 */
+.help-block {
+    display: block;
+    margin-top: 0.25rem;
+    color: #6c757d;
+    font-size: 0.875em;
+}
+
+/* .input-group-addon → .input-group-text in BS5 */
+.input-group-addon {
+    display: flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+}
+
+/* .input-group-btn (BS3) — make it work */
+.input-group-btn {
+    position: relative;
+    font-size: 0;
+    white-space: nowrap;
+}
+.input-group-btn > .btn {
+    position: relative;
+}
+
+/* .radio, .checkbox inline variants */
+.radio-inline,
+.checkbox-inline {
+    display: inline-block;
+    padding-left: 0;
+    margin-bottom: 0;
+    font-weight: 400;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+/* ============================================================
+   MISC BS3 CLASSES
+   ============================================================ */
+
+/* .sr-only → .visually-hidden in BS5 */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* BS3 page-header */
+.page-header {
+    padding-bottom: 0.5rem;
+    margin: 2.5rem 0 1.25rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* .thumbnail */
+.thumbnail {
+    display: block;
+    padding: 4px;
+    margin-bottom: 20px;
+    line-height: 1.428571429;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border .2s ease-in-out;
+}
+.thumbnail > img,
+.thumbnail a > img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* .media and .media-body */
+.media {
+    display: flex;
+    align-items: flex-start;
+}
+.media-body {
+    flex: 1;
+}
+
+/* BS3 list-group-item active */
+.list-group-item.active {
+    z-index: 2;
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* ============================================================
+   TAB-PANE .in → .show compat (BS3 used .in for active fade)
+   ============================================================ */
+.tab-pane.in {
+    display: block;
+    opacity: 1;
+}
+.tab-pane.fade.in {
+    opacity: 1;
+}
+
+/* ============================================================
+   SIGNIN FORM (from BS3 signin.css example)
+   ============================================================ */
+.form-signin {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+    margin-bottom: 10px;
+}
+.form-signin .checkbox {
+    font-weight: normal;
+}
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* ============================================================
+   HEADER-AREA — títulos administrativos
+   ============================================================ */
+.header-area-titulo {
+    color: #7a869a;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 2px;
+}
+.header-area-evento {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* ============================================================
+   Clearfix — applied broadly for float-based cols outside .row
+   ============================================================ */
+.row::after {
+    content: "";
+    display: table;
+    clear: both;
+}

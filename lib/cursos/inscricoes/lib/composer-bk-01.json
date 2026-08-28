@@ -1,0 +1,16 @@
+{
+    "name": "opctec/opctec-eventos",
+    "description": "Gestor de eventos e cursos",
+    "keywords": ["eventos"],
+    "homepage": "http://www.opctec.com.br",
+    "authors": [
+        {
+            "name": "OPCTEC"
+        }
+    ],
+    "require": {
+        "spipu/html2pdf": "*",
+        "firebase/php-jwt": "^5.0",
+        "phpmailer/phpmailer": "^6.1"
+    }
+}
