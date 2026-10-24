@@ -9,7 +9,7 @@ if (!session_id()) {
 // $_SESSION['_administrativo'] = null;
 // $_SESSION['_logado'] = null;
 
-if($_GET['figura']==true){
+if(!empty($_GET['figura'])){
     // header('Content-Type: image/png');
 } else {
     header('Content-Type: text/html; charset=UTF-8');

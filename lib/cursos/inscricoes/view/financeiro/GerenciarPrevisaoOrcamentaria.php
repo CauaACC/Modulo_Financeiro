@@ -226,7 +226,7 @@ require_once(dirname(__FILE__)."/../../include/config.php");
                 <form  id="formPrevisaoOrcamentaria" name="formPrevisaoOrcamentaria" action="<?php echo  WB_URL_COMMAND ?>&dummy=" method="post">
                     <div class="form-group col-sm-7" style="padding-left: 0px;">
                         <div class="form-group col-sm-4" style="padding-left: 0px;">
-                            <label for="tipo">Classificação Contábil:</label>
+                            <label for="tipo">Classificação:</label>
                             <select id="tipo" name="tipo" class="form-control" placeholder="Nome para Certificado" required autofocus>
                                 <option></option>
                                 <option value="Receita">Receita</option>
@@ -236,7 +236,7 @@ require_once(dirname(__FILE__)."/../../include/config.php");
                         <div class="form-group col-sm-8" style="padding-left: 0px;">
                             <label for="codTipoReceitaDespesa">Despesa com:</label>
                             <select id="codTipoReceitaDespesa" name="codTipoReceitaDespesa" class="form-control" placeholder="Despesa com..." required autofocus>
-                                <option>Selecione uma classificação contábil</option>
+                                <option>Selecione uma classificação</option>
                             </select>
                         </div>
                         <div class="form-group col-sm-12" style="padding-left: 0px;">

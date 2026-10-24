@@ -15,59 +15,76 @@ class GerenciarRateiosAC {
     }
 
     public function editarRateios($fws_, $debug = false) {
-        $obj = $this->carregarRateios($fws_,$debug);
+        $ok = true;
+        $message = '';
+        try {
+            $obj = $this->carregarRateios($fws_, $debug);
+        } catch (Exception $e) {
+            $ok = false;
+            $message = $e->getMessage();
+            $obj = new Rateios();
+        }
 
+        header('Content-Type: application/json; charset=UTF-8');
         echo '{
                   "statusMessage":"' . $ok . '",
-                  "message":      "' . $obj->getMessage() . '",
+                  "message":      "' . tratarJson($message) . '",
                   "codRateio": "' . $obj->getCodRateio() . '",
                   "codRateioPrincipal": "' . $obj->getCodRateioPrincipal() . '",
                   "codCentroCusto": "' . $obj->getCodCentroCusto() . '",
-                  "nomeRateio":"' . $obj->getNomeRateio() . '",
-                  "codigoContabilRateio":"' . $obj->getCodigoContabilRateio() . '",
+                  "nomeRateio":"' . tratarJson($obj->getNomeRateio()) . '",
+                  "codigoContabilRateio":"' . tratarJson($obj->getCodigoContabilRateio()) . '",
                   "percentual":"' . $obj->getPercentual() . '",
-                  "descricao":"' . $obj->getDescricao() . '",
+                  "descricao":"' . tratarJson($obj->getDescricao()) . '",
                   "status":"' . $obj->getStatus() . '"
                  }';
         exit();
     }
 
     public function salvarRateios($fws_, $debug = false) {
+        $ok = false;
+        $message = '';
+        $obj = new Rateios();
         try {
-            // if ($fws_['novocodRateio'] == 0) {
-            //     $fws_['codRateio'] = NULL;
-            // }
             $isForm = true;
             $obj = $this->carregarRateios($fws_);
             $obj->setAll($fws_, $isForm);
             $obj->salvar($debug);
-        } catch (OkException $e) {
+        } catch (OKException $e) {
             $ok = true;
+            $message = $e->getMessage();
         } catch (Exception $e) {
             $ok = false;
+            $message = $e->getMessage();
         }
 
+        header('Content-Type: application/json; charset=UTF-8');
         echo '{
         "statusMessage":"' . $ok . '",
-        "message":      "' . tratarJson($e->getMessage()) . '",
+        "message":      "' . tratarJson($message) . '",
         "codRateio":"' . $obj->getCodRateio() . '"
         }';
     }
 
     public function excluirRateios($fws_, $debug = false) {
+        $ok = false;
+        $message = '';
         try {
             $obj = new Rateios();
             $obj->setcodRateio($fws_['codRateio']);
             $obj->excluir();
         } catch (OKException $e) {
             $ok = true;
+            $message = $e->getMessage();
         } catch (Exception $e) {
             $ok = false;
+            $message = $e->getMessage();
         }
 
+        header('Content-Type: application/json; charset=UTF-8');
         echo '{
         "statusMessage":"' . $ok . '",
-        "message":      "' . tratarJson( $e->getMessage()) . '",
+        "message":      "' . tratarJson($message) . '",
         "codRateio":"' . $fws_['codRateio'] . '"
         }';
     }
@@ -75,6 +92,7 @@ class GerenciarRateiosAC {
     public function carregarTabelaRateioss($fws_, $debug = false) {
         $obj = new Rateios();
         $objEv = $obj->getEvento();
+        $ii = 0;
         try {
             $obj->carregarListaRateios(false, $debug);
             $objEv->getGestor();
@@ -83,6 +101,8 @@ class GerenciarRateiosAC {
                 $ii++;
                 $ehFilho = ($objL->getCodRateioPrincipal() != null && $objL->getCodRateioPrincipal() != '');
                 $classeHierarquia = $ehFilho ? 'rateio-filho' : 'rateio-pai';
+                $codigo = $objL->getCodigoContabilRateio();
+                $nivel = $codigo ? substr_count($codigo, '.') : 0;
                 ?>
                 <tr id="<?php echo  $objL->getCodRateio() ?>" data-cod-rateio-principal="<?php echo $objL->getCodRateioPrincipal() ?>" class="<?php echo $classeHierarquia ?>">
                     <td>
@@ -92,10 +112,11 @@ class GerenciarRateiosAC {
                         <?php } ?>
                     </td>
                     <td class="col-codigo">
-                        <?php if ($ehFilho) { ?><span class="tree-indent"></span><?php } ?>
-                        <?php echo $objL->getCodigoContabilRateio(); ?>
+                        <?php for ($i = 0; $i < $nivel; $i++) { ?><span class="tree-indent"></span><?php } ?>
+                        <?php echo $codigo; ?>
                     </td>
                     <td class="col-nome">
+                        <?php for ($i = 0; $i < $nivel - 1; $i++) { ?><span class="tree-indent"></span><?php } ?>
                         <?php if ($ehFilho) { ?><span class="tree-connector">└</span><?php } ?>
                         <?php echo $objL->getNomeRateio(); ?>
                     </td>

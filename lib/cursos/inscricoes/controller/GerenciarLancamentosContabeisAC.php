@@ -414,11 +414,17 @@ class GerenciarLancamentosContabeisAC {
             }
             ?>
                 </tbody><tfoot>
+                <?php
+                $saldo = $totalCredito - $totalDebito;
+                $ladoSaldo = $saldo >= 0 ? 'C' : 'D';
+                $corSaldo = $saldo >= 0 ? '#27ae60' : '#e74c3c';
+                ?>
                 <tr style="border-top:2px solid #333; font-weight:700;">
                     <td colspan="4" style="padding:10px;">TOTAIS<?php echo count($filtros) ? ' (filtrados)' : ''; ?></td>
                     <td class="col-num" style="padding:10px;">
                         D R$ <?php echo number_format($totalDebito, 2, ',', '.'); ?><br>
-                        C R$ <?php echo number_format($totalCredito, 2, ',', '.'); ?>
+                        C R$ <?php echo number_format($totalCredito, 2, ',', '.'); ?><br>
+                        <span style="color:<?php echo $corSaldo; ?>;">S R$ <?php echo number_format(abs($saldo), 2, ',', '.'); ?> (<?php echo $ladoSaldo; ?>)</span>
                     </td>
                     <td colspan="5"></td>
                 </tr>

@@ -37,6 +37,15 @@ $objSRV = new GerenciarCentroCustoAC();
     .btn-acao:hover { background:#f5f5f5; color:#333; border-color:#ccc; }
     .btn-acao.btn-acao-excluir:hover { background:#fef2f2; color:#c0392b; border-color:#f5c6cb; }
     .tbl-fin tbody td:first-child, .tbl-fin thead th:first-child { white-space:nowrap; width:1%; }
+
+    /* Hierarquia */
+    .centro-pai { background:#f8f9fb; }
+    .centro-pai td.col-nome { font-weight:700; color:#222; }
+    .centro-pai td.col-codigo { font-weight:700; }
+    .centro-filho { background:#fff; }
+    .centro-filho td.col-nome { font-weight:400; color:#555; }
+    .tree-connector { display:inline-block; color:#bbb; margin-right:6px; font-family:monospace; font-size:13px; vertical-align:middle; }
+    .tree-indent { display:inline-block; width:20px; }
 </style>
 <script type="text/javascript">
     var _codExcluir = null;
@@ -203,7 +212,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
             <thead>
                 <tr>
                     <th style="width:80px;">Ações</th>
-                    <th class="col-codigo" data-col="1">Código Contábil <span class="sort-arrow">↑↓</span></th>
+                    <th class="col-codigo" data-col="1">Código <span class="sort-arrow">↑↓</span></th>
                     <th data-col="2">Nome <span class="sort-arrow">↑↓</span></th>
                     <th data-col="3">Descrição <span class="sort-arrow">↑↓</span></th>
                 </tr>

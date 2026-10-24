@@ -236,7 +236,7 @@ class GerenciarRelatoriosFinanceirosAC {
                 $ii++;
                 ?>
                 <tr>
-                    <td><?php echo $objL->getCodigoContabilCC(); ?></td>
+                    <td><?php echo $objL->getCodigoContabil(); ?></td>
                     <td class="col-nome"><?php echo $objL->getNomeCentroCusto(); ?></td>
                     <td><?php echo $objL->getDescricao(); ?></td>
                 </tr>
@@ -912,7 +912,7 @@ class GerenciarRelatoriosFinanceirosAC {
         $blocos = array();
         switch ($aba) {
             case 'lancamentos':
-                $titulo = 'Lancamentos Contabeis'; $arquivo = 'lancamentos';
+                $titulo = 'Lancamentos'; $arquivo = 'lancamentos';
                 $blocos[] = $this->blocoLancamentos($fws_, $debug);
                 break;
             case 'razao':
@@ -1194,7 +1194,7 @@ class GerenciarRelatoriosFinanceirosAC {
             $obj = new CentroCusto();
             $obj->carregarListaCentroCusto(false, $debug);
             foreach ((array) $obj->getListaCentroCusto() as $o) {
-                $linhas[] = array($o->getCodigoContabilCC(), $o->getNomeCentroCusto(), $o->getDescricao());
+                $linhas[] = array($o->getCodigoContabil(), $o->getNomeCentroCusto(), $o->getDescricao());
             }
         } catch (Exception $e) {}
         return array('colunas' => array('Codigo', 'Nome', 'Descricao'), 'linhas' => $linhas);
@@ -1245,7 +1245,7 @@ class GerenciarRelatoriosFinanceirosAC {
         $evento = ($rs && !$rs->EOF) ? $this->paraUtf8($rs->fields['evento']) : ('Evento ' . COD_EVENTO);
         $gestor = ($rs && !$rs->EOF) ? $this->paraUtf8($rs->fields['gestor']) : '';
 
-        $sql = sprintf("SELECT nome_centro_custo, codigo_contabil_cc FROM fin_centro_custo
+        $sql = sprintf("SELECT nome_centro_custo, codigo_contabil FROM fin_centro_custo
                          WHERE cod_evento = '%s' AND status = 'ATIVADA'
                          ORDER BY cod_centro_custo LIMIT 1", COD_EVENTO);
         $rs = $this->conex->Execute($sql);
@@ -1253,7 +1253,7 @@ class GerenciarRelatoriosFinanceirosAC {
             'evento'        => $evento,
             'gestor'        => $gestor,
             'centro'        => ($rs && !$rs->EOF) ? $this->paraUtf8($rs->fields['nome_centro_custo']) : '',
-            'centro_codigo' => ($rs && !$rs->EOF) ? $rs->fields['codigo_contabil_cc'] : '',
+            'centro_codigo' => ($rs && !$rs->EOF) ? $rs->fields['codigo_contabil'] : '',
         );
     }
 

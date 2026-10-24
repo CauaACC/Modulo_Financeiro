@@ -213,7 +213,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
             <thead>
                 <tr>
                     <th style="width:80px;">Ações</th>
-                    <th class="col-codigo" data-col="1">Código Contábil <span class="sort-arrow">↑↓</span></th>
+                    <th class="col-codigo" data-col="1">Código <span class="sort-arrow">↑↓</span></th>
                     <th data-col="2">Nome <span class="sort-arrow">↑↓</span></th>
                     <th data-col="3">Centro de Custo <span class="sort-arrow">↑↓</span></th>
                     <th class="col-num" data-col="4">Percentual <span class="sort-arrow">↑↓</span></th>

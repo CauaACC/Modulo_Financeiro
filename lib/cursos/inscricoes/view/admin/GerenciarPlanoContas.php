@@ -249,7 +249,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
             <thead>
                 <tr>
                     <th style="width:80px;">Ações</th>
-                    <th class="col-codigo" data-col="1">Código Contábil <span class="sort-arrow">↑↓</span></th>
+                    <th class="col-codigo" data-col="1">Código <span class="sort-arrow">↑↓</span></th>
                     <th data-col="2">Nome <span class="sort-arrow">↑↓</span></th>
                     <th data-col="3">Descrição</th>
                     <th data-col="4">Tipo de Conta <span class="sort-arrow">↑↓</span></th>
@@ -282,7 +282,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label for="codigoContabil">Código Contábil:</label>
+                                <label for="codigoContabil">Código:</label>
                                 <input type="text" id="codigoContabil" name="codigoContabil" value="" class="form-control" placeholder="Ex.: 0106">
                                 <small class="text-muted">Deixe em branco para gerar automaticamente.</small>
                             </div>

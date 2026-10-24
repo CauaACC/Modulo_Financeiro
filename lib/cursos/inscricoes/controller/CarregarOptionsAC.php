@@ -1678,7 +1678,7 @@ class CarregarOptionsAC {
                     <option
                         <?php echo verifItemSelected($fws_['cod_centro_custo'], $objL->getCodCentroCusto()) ?>
                         value='<?php echo $objL->getCodCentroCusto()?>'>
-                        <?php echo $objL->getCodigoContabilCC() .' '. $objL->getDescricao() ?>
+                        <?php echo $objL->getCodigoContabil() .' '. $objL->getDescricao() ?>
                     </option>
                     <?php
                 }

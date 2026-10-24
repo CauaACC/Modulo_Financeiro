@@ -170,7 +170,7 @@ $objSRV = new GerenciarLancamentosContabeisAC();
         $('#comprovante').val('');
         $('#comprovanteAtual').html('');
         $('#btnSalvarComoNovo').hide();
-        $('#modalLancamentoLabel').html('<i class="fa fa-pencil-square-o" style="margin-right:8px; opacity:0.8;"></i>Novo Lançamento Contábil');
+        $('#modalLancamentoLabel').html('<i class="fa fa-pencil-square-o" style="margin-right:8px; opacity:0.8;"></i>Novo Lançamento');
         $('#modalLancamento').modal('show');
     }
 
@@ -346,7 +346,7 @@ $objSRV = new GerenciarLancamentosContabeisAC();
                 $('#codInscrito').val(data.codInscrito || '');
                 $('#favorecido').val(data.favorecido || '');
                 $('#numDocumento').val(data.numDocumento || '');
-                $('#modalLancamentoLabel').html('<i class="fa fa-pencil-square-o" style="margin-right:8px; opacity:0.8;"></i>Editar Lançamento Contábil');
+                $('#modalLancamentoLabel').html('<i class="fa fa-pencil-square-o" style="margin-right:8px; opacity:0.8;"></i>Editar Lançamento');
                 // "Salvar como novo" so faz sentido a partir de um existente
                 $('#btnSalvarComoNovo').show();
                 $('#modalLancamento').modal('show');
@@ -602,7 +602,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
 
 <div style="background:#fff; border:1px solid #e8e8e8; border-radius:12px; overflow:hidden; margin-top:10px;">
     <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 20px; border-bottom:1px solid #eee;">
-        <h4 style="margin:0; font-size:15px; font-weight:600; color:#333;">Gerenciar Lançamentos Contábeis</h4>
+        <h4 style="margin:0; font-size:15px; font-weight:600; color:#333;">Gerenciar Lançamentos</h4>
         <div>
             <button type="button" class="btn btn-sm" style="margin-right:6px;" onclick="abrirContabilizacao('incremental')" title="Lança apenas os pagamentos ainda não contabilizados">
                 <i class="fa fa-refresh"></i> Contabilizar pagamentos
@@ -715,7 +715,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header modalCabecalho">
-                <h4 class="modal-title" id="modalLancamentoLabel"><i class="fa fa-pencil-square-o"></i>Novo Lançamento Contábil</h4>
+                <h4 class="modal-title" id="modalLancamentoLabel"><i class="fa fa-pencil-square-o"></i>Novo Lançamento</h4>
                 <button type="button" class="close modalBtnFechar" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
@@ -885,7 +885,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
                 <button type="button" class="close modalBtnFechar" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
-                <p>Deseja realmente excluir este Lançamento Contábil?</p>
+                <p>Deseja realmente excluir este Lançamento?</p>
                 <p><strong>Esta ação é irreversível.</strong></p>
             </div>
             <div class="modal-footer modalRodape">

@@ -225,6 +225,11 @@ class LancamentosContabeisDAO extends DAO{
      */
     public function carregarListaFiltrada(LancamentosContabeis $obj, $filtros = array(), $debug = false) {
         try {
+            // NOTA: fin_lancamentos_contabeis nao possui as colunas num_documento,
+            // arquivo_comprovante, cod_inscrito nem favorecido (essas sao gravadas
+            // apenas em fin_lancamentos_contabeis_excluidos). O SELECT devolve NULL
+            // para elas para nao quebrar o front-end, e os filtros que dependiam
+            // dessas colunas foram removidos.
             $where = '';
 
             if (!empty($filtros['dataInicio'])) {
@@ -251,9 +256,6 @@ class LancamentosContabeisDAO extends DAO{
                 }
             }
             // filtros diretos -- usados pelos links da aba Duplicidades
-            if (!empty($filtros['filtroInscrito'])) {
-                $where .= sprintf(' AND flc.cod_inscrito = %d', intval($filtros['filtroInscrito']));
-            }
             if (!empty($filtros['filtroPagamento'])) {
                 $where .= sprintf(' AND flc.cod_pagamento = %d', intval($filtros['filtroPagamento']));
             }
@@ -266,31 +268,27 @@ class LancamentosContabeisDAO extends DAO{
             }
             if (!empty($filtros['busca'])) {
                 $b = $this->conex->qstr('%' . $filtros['busca'] . '%');
-                $cond = sprintf('flc.historico LIKE %s OR flc.num_documento LIKE %s
-                                 OR COALESCE(i.nome_inscrito, flc.favorecido) LIKE %s', $b, $b, $b);
-                // termo so com digitos tambem procura por codigo -- e assim que
-                // se acha "o lancamento daquele pagamento/inscrito/pedido"
+                $cond = sprintf('flc.historico LIKE %s', $b);
+                // termo so com digitos tambem procura por codigo de pagamento/pedido
                 if (ctype_digit(trim($filtros['busca']))) {
                     $n = intval($filtros['busca']);
-                    $cond .= sprintf(' OR flc.cod_inscrito = %d OR flc.cod_pagamento = %d
+                    $cond .= sprintf(' OR flc.cod_pagamento = %d
                                        OR EXISTS (SELECT 1 FROM tab_pagamentos pp
                                                    WHERE pp.cod_evento = flc.cod_evento
                                                      AND pp.cod_pagamento = flc.cod_pagamento
-                                                     AND pp.pedido_id = %d)', $n, $n, $n);
+                                                     AND pp.pedido_id = %d)', $n, $n);
                 }
                 $where .= ' AND (' . $cond . ')';
             }
 
             $sql = sprintf('SELECT flc.cod_lancamentos_contabeis, flc.data_competencia, flc.data_financeira,
                                    flc.tipo_lancamento, flc.valor, flc.flg_lancamento, flc.origem_lancamento,
-                                   flc.historico, flc.num_documento, flc.conciliado, flc.arquivo_comprovante,
-                                   fpc.codigo_contabil, fpc.nome_plano_contas,
-                                   COALESCE(i.nome_inscrito, flc.favorecido) AS favorecido
+                                   flc.historico, flc.conciliado,
+                                   NULL AS num_documento, NULL AS arquivo_comprovante, NULL AS favorecido,
+                                   fpc.codigo_contabil, fpc.nome_plano_contas
                               FROM fin_lancamentos_contabeis flc
                               LEFT JOIN fin_plano_contas fpc ON fpc.cod_plano_contas = flc.cod_plano_contas
                                                             AND fpc.cod_evento = flc.cod_evento
-                              LEFT JOIN tab_inscritos i ON i.cod_inscrito = flc.cod_inscrito
-                                                       AND i.cod_evento = flc.cod_evento
                              WHERE flc.cod_evento = %d %s
                              ORDER BY flc.data_competencia DESC, flc.cod_lancamentos_contabeis DESC',
                            $obj->getCodEvento(), $where);

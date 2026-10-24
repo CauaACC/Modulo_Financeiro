@@ -96,7 +96,11 @@ class RateiosDAO extends DAO{
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fr.cod_gestor
             LEFT JOIN fin_centro_custo AS fcc ON fcc.cod_centro_custo = fr.cod_centro_custo AND fcc.cod_evento = fr.cod_evento
             WHERE fr.cod_evento=\'%s\'
-            ORDER BY COALESCE(fr.cod_rateio_principal, fr.cod_rateio), fr.cod_rateio_principal IS NOT NULL, fr.cod_rateio
+            ORDER BY
+              CAST(SUBSTRING_INDEX(fr.codigo_contabil_rateio, \'.\', 1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_contabil_rateio, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_contabil_rateio, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_contabil_rateio, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;

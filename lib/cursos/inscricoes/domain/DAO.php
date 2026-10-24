@@ -32,7 +32,8 @@ class DAO{
             Login Logado: ".$_SESSION['_login']."
             Browser: ".$_SERVER['HTTP_USER_AGENT']."
             IP:".$_SERVER['REMOTE_ADDR']."\nMensagem de Log:\n ".$msgErro."\n";
-        $msgSubject="[".ABREV_EVENTO."][".$_SERVER["SERVER_NAME"]."]".get_class($this);
+        $abrevEvento = defined('ABREV_EVENTO') ? ABREV_EVENTO : 'unknown';
+        $msgSubject="[".$abrevEvento."][".$_SERVER["SERVER_NAME"]."]".get_class($this);
         $msgTo="eventos@opctec.com.br";
         $txtLog = $msgSubject."\nAviso de Tela:".$avisodeTela.$msgErro."\n";
         executarLog($txtLog,"DAO",true);        
@@ -59,6 +60,9 @@ class DAO{
                 $msg .= " Valor duplicado: <b>" . htmlspecialchars($valor) . "</b>";
             }
             throw new Exception($msg);
+        }
+        if ($_SERVER['HTTP_HOST'] == 'eventos.test') {
+            throw new Exception("Erro SQL (local): " . $avisodeTela);
         }
         throw new Exception("Não foi possível executar o comando desejado.");
     }

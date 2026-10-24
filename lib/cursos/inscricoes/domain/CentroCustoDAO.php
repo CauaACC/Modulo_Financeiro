@@ -90,11 +90,15 @@ class CentroCustoDAO extends DAO{
     }       
     public function carregarListaCentroCustoByIdEvento(CentroCusto $obj, $condicoes=false, $debug=false) {
         try{
-            $sql = sprintf('SELECT fcc.*, (SELECT COUNT(cod_centro_custo_pai) AS total_filho FROM fin_centro_custo 
+            $sql = sprintf('SELECT fcc.*, (SELECT COUNT(cod_centro_custo_pai) AS total_filho FROM fin_centro_custo
             WHERE cod_centro_custo_pai = fcc.cod_centro_custo) AS total_filho FROM fin_centro_custo fcc
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fcc.cod_gestor
             WHERE fcc.cod_evento=\'%s\'
-            ORDER BY cod_centro_custo
+            ORDER BY
+              CAST(SUBSTRING_INDEX(fcc.codigo_contabil, \'.\', 1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -120,7 +124,11 @@ class CentroCustoDAO extends DAO{
             $sql = sprintf('SELECT fcc.* FROM fin_centro_custo fcc
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fcc.cod_gestor
             WHERE fcc.cod_evento=\'%s\'
-            ORDER BY cod_centro_custo 
+            ORDER BY
+              CAST(SUBSTRING_INDEX(fcc.codigo_contabil, \'.\', 1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -141,84 +149,63 @@ class CentroCustoDAO extends DAO{
             return false;
         }
     }
-    public function gerarCodigoContabilCC(CentroCusto $obj, $debug = false) {
+    public function gerarCodigoContabil(CentroCusto $obj, $debug = false) {
         try {
 
             $this->conex->debug = $debug;
 
-            // ==========================
-            // CONTA RAIZ
-            // ==========================
+            // Raiz: proximo inteiro
             if ($obj->getCodCentroCustoPai() == null) {
-
-                $sql = "
-                    SELECT MAX(CAST(cod_centro_custo AS UNSIGNED))
-                    FROM fin_centro_custo
-                    WHERE cod_centro_custo_pai IS NULL
-                ";
+                $sql = "SELECT MAX(CAST(codigo_contabil AS UNSIGNED))
+                        FROM fin_centro_custo
+                        WHERE cod_centro_custo_pai IS NULL";
 
                 $ultimoCodigo = $this->conex->GetOne($sql);
-                $codigoContabilCC = ($ultimoCodigo ? $ultimoCodigo : 0) + 1;
+                $codigoContabil = ($ultimoCodigo ? $ultimoCodigo : 0) + 1;
 
-                return [
-                    'cod_centro_custo'   => (string)$codigoContabilCC
-                ];
+                return ['codigo_contabil' => (string)$codigoContabil];
             }
 
-            // ==========================
-            // CONTA FILHA
-            // ==========================
-
-            // 1️⃣ Buscar código contábil do pai
+            // Filho: <codigo_do_pai>.<proximo_nivel>
             $sql = sprintf(
-                "SELECT cod_centro_custo
-                FROM fin_centro_custo
-                WHERE cod_centro_custo = '%s'",
+                "SELECT codigo_contabil FROM fin_centro_custo
+                 WHERE cod_centro_custo = '%s'",
                 $obj->getCodCentroCustoPai()
             );
-
             $codigoPai = $this->conex->GetOne($sql);
-
             if (!$codigoPai) {
-                throw new Exception('Conta pai não encontrada');
+                throw new Exception('Centro de custo pai nao encontrado');
             }
 
-            // 2️⃣ Buscar maior nível entre os filhos
             $sql = sprintf(
-                "SELECT MAX(
-                    CAST(SUBSTRING_INDEX(cod_centro_custo, '.', -1) AS UNSIGNED)
-                )
-                FROM fin_centro_custo
-                WHERE cod_centro_custo_pai = '%s'",
+                "SELECT MAX(CAST(SUBSTRING_INDEX(codigo_contabil, '.', -1) AS UNSIGNED))
+                 FROM fin_centro_custo
+                 WHERE cod_centro_custo_pai = '%s'",
                 $obj->getCodCentroCustoPai()
             );
-
             $ultimoNivel = $this->conex->GetOne($sql);
             $proximoNivel = ($ultimoNivel ? $ultimoNivel : 0) + 1;
 
-            // 3️⃣ Montar novo código contábil
-            $codigoContabilCC = $codigoPai . '.' . $proximoNivel;
-
-            return [
-                'cod_centro_custo'   => $codigoContabilCC
-            ];
+            return ['codigo_contabil' => $codigoPai . '.' . $proximoNivel];
         } catch (ADODB_Exception $e) {
             $this->enviarMensagem($e);
             return false;
-        } 
-    
+        }
     }
 
     public function insert(CentroCusto $obj, $debug=false) {
-        try {           
+        try {
             $obj->setDatIncl(date('Y-m-d H:i:s'));
             $obj->setResIncl($_SESSION['_cod_usuario']);
             $obj->setIp($_SERVER['REMOTE_ADDR']);
             $obj->setHttpUserAgent($_SERVER['HTTP_USER_AGENT']);
             $obj->setVersao(1);
             $obj->setStatus('ATIVADA');
-            $dados = $this->gerarCodigoContabilCC($obj);
-            $obj->setCodigoContabilCC($dados['cod_centro_custo']);
+            // Gera codigo_contabil hierarquico so quando o usuario nao informou
+            if ($obj->getCodigoContabil() === null || trim($obj->getCodigoContabil()) === '') {
+                $dados = $this->gerarCodigoContabil($obj);
+                $obj->setCodigoContabil($dados['codigo_contabil']);
+            }
             
                         
             $sql = "SELECT * FROM fin_centro_custo 

@@ -1,7 +1,8 @@
 Options -Indexes
 
 <IfModule mime_module>
-  AddHandler application/x-httpd-ea-php74___lsphp .php .php7 .phtml
+  # Handler especÃ­fico do LiteSpeed do HostGator â€” desativado no Laragon (Apache/mod_php)
+  # AddHandler application/x-httpd-ea-php74___lsphp .php .php7 .phtml
 </IfModule>
 
 RewriteEngine On
@@ -12,7 +13,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 RewriteRule ^ping_sessao\.php$ - [L]
-# … suas outras regras (que normalmente mandam tudo pro index.php)
+# ï¿½ suas outras regras (que normalmente mandam tudo pro index.php)
 
 RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/transparencia/(.*)$ lib/cursos/transparencia/$3 [QSA,L]
 
@@ -38,7 +39,7 @@ RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/certificados/validar/(.*)$ lib/cu
 RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/certificados/validar?(.*)$ lib/cursos/certificados/validar/$3?rota=$2&prefixo=$1 [QSA,L]
 # Canonicaliza: .../certificados/validar  ->  .../certificados/validar/
 RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/certificados/validar$ $1/$2/certificados/validar/ [R=301,L]
-## Roteia já com barra (funciona com ou sem "resto" depois de validar/)
+## Roteia jï¿½ com barra (funciona com ou sem "resto" depois de validar/)
 RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/certificados/validar/(.*)$ lib/cursos/certificados/validar/$3?rota=$2&prefixo=$1 [QSA,L]
 
 RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/recibos/validar/(.*)$ lib/cursos/recibos/validar/$3?rota=$2&prefixo=$1 [QSA,L]
