@@ -914,7 +914,7 @@ $(document).ready(function() {
              $pedido_titulo = $RS_P->fields[15];
              
              // Pagamento estornado/cancelado/devolvido: fica visivel (vermelho),
-             // mas fora do total e sem Recibo/Whats — contabilmente nao e receita.
+             // mas fora do total e sem Recibo/Whats — financeiramente nao e receita.
              $pagEstornado = in_array(trim((string)$status), array('ESTORNADO','CANCELADO','DEVOLVIDO'));
 
              If($valor==""){

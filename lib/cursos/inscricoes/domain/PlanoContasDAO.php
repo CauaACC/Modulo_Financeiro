@@ -100,7 +100,7 @@ class PlanoContasDAO extends DAO{
             $sql = sprintf('SELECT fpc.*, (SELECT COUNT(cod_plano_contas_pai) AS total_filho FROM fin_plano_contas WHERE cod_plano_contas_pai = fpc.cod_plano_contas) AS total_filho FROM fin_plano_contas fpc
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fpc.cod_gestor
             WHERE fpc.cod_evento=\'%s\' '.$wherePlano.'
-            ORDER BY codigo_contabil 
+            ORDER BY codigo_financeiro 
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -126,7 +126,7 @@ class PlanoContasDAO extends DAO{
             $sql = sprintf('SELECT fpc.* FROM fin_plano_contas fpc
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fpc.cod_gestor
             WHERE fpc.cod_evento=\'%s\' AND fpc.natureza_saldo = \'DEBITO\' AND fpc.aceita_lancamento = 1
-            ORDER BY codigo_contabil 
+            ORDER BY codigo_financeiro 
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -152,7 +152,7 @@ class PlanoContasDAO extends DAO{
             $sql = sprintf('SELECT fpc.* FROM fin_plano_contas fpc
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fpc.cod_gestor
             WHERE fpc.cod_evento=\'%s\' AND fpc.natureza_saldo = \'CREDITO\' AND fpc.aceita_lancamento = 1
-            ORDER BY codigo_contabil 
+            ORDER BY codigo_financeiro 
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -178,7 +178,7 @@ class PlanoContasDAO extends DAO{
             $sql = sprintf('SELECT fpc.* FROM fin_plano_contas fpc
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fpc.cod_gestor
             WHERE fpc.cod_evento=\'%s\'
-            ORDER BY codigo_contabil 
+            ORDER BY codigo_financeiro 
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -199,7 +199,7 @@ class PlanoContasDAO extends DAO{
             return false;
         }
     }
-    public function gerarCodigoContabil(PlanoContas $obj, $debug = false) {
+    public function gerarCodigoFinanceiro(PlanoContas $obj, $debug = false) {
         try {
 
             $this->conex->debug = $debug;
@@ -210,16 +210,16 @@ class PlanoContasDAO extends DAO{
             if ($obj->getCodPlanoContasPai() == null) {
 
                 $sql = "
-                    SELECT MAX(CAST(codigo_contabil AS UNSIGNED))
+                    SELECT MAX(CAST(codigo_financeiro AS UNSIGNED))
                     FROM fin_plano_contas
                     WHERE cod_plano_contas_pai IS NULL
                 ";
 
                 $ultimoCodigo = $this->conex->GetOne($sql);
-                $codigoContabil = ($ultimoCodigo ? $ultimoCodigo : 0) + 1;
+                $codigoFinanceiro = ($ultimoCodigo ? $ultimoCodigo : 0) + 1;
 
                 return [
-                    'codigo_contabil'   => (string)$codigoContabil,
+                    'codigo_financeiro'   => (string)$codigoFinanceiro,
                     'aceita_lancamento' => 0
                 ];
             }
@@ -230,7 +230,7 @@ class PlanoContasDAO extends DAO{
 
             // 1️⃣ Buscar código contábil do pai
             $sql = sprintf(
-                "SELECT codigo_contabil
+                "SELECT codigo_financeiro
                 FROM fin_plano_contas
                 WHERE cod_plano_contas = '%s'",
                 $obj->getCodPlanoContasPai()
@@ -245,7 +245,7 @@ class PlanoContasDAO extends DAO{
             // 2️⃣ Buscar maior nível entre os filhos
             $sql = sprintf(
                 "SELECT MAX(
-                    CAST(SUBSTRING_INDEX(codigo_contabil, '.', -1) AS UNSIGNED)
+                    CAST(SUBSTRING_INDEX(codigo_financeiro, '.', -1) AS UNSIGNED)
                 )
                 FROM fin_plano_contas
                 WHERE cod_plano_contas_pai = '%s'",
@@ -256,7 +256,7 @@ class PlanoContasDAO extends DAO{
             $proximoNivel = ($ultimoNivel ? $ultimoNivel : 0) + 1;
 
             // 3️⃣ Montar novo código contábil
-            $codigoContabil = $codigoPai . '.' . $proximoNivel;
+            $codigoFinanceiro = $codigoPai . '.' . $proximoNivel;
 
             /* 4️⃣ Pai vira conta sintética (não lançável)
             $sql = sprintf(
@@ -268,7 +268,7 @@ class PlanoContasDAO extends DAO{
             $this->conex->Execute($sql);
             */
             return [
-                'codigo_contabil'   => $codigoContabil
+                'codigo_financeiro'   => $codigoFinanceiro
             ];
         } catch (ADODB_Exception $e) {
             $this->enviarMensagem($e);
@@ -285,9 +285,9 @@ class PlanoContasDAO extends DAO{
             $obj->setVersao(1);
             $obj->setStatus('ATIVADA');
             // Respeita o código contábil informado manualmente; gera automaticamente só quando em branco
-            if ($obj->getCodigoContabil() === null || trim($obj->getCodigoContabil()) === '') {
-                $dados = $this->gerarCodigoContabil($obj);
-                $obj->setCodigoContabil($dados['codigo_contabil']);
+            if ($obj->getCodigoFinanceiro() === null || trim($obj->getCodigoFinanceiro()) === '') {
+                $dados = $this->gerarCodigoFinanceiro($obj);
+                $obj->setCodigoFinanceiro($dados['codigo_financeiro']);
             }
                         
             $sql = "SELECT * FROM fin_plano_contas 

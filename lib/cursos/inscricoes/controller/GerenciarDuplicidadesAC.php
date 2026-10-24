@@ -279,7 +279,7 @@ class GerenciarDuplicidadesAC {
      * $tipo: pedido | inscrito | pagamento
      */
     private function linkLancamentos($tipo, $valor) {
-        return 'index.php?content=view/admin/GerenciarLancamentosContabeis.php&'
+        return 'index.php?content=view/admin/GerenciarLancamentos.php&'
              . rawurlencode($tipo) . '=' . rawurlencode($valor);
     }
 }

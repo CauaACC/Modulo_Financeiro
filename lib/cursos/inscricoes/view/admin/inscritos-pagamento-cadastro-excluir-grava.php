@@ -56,7 +56,7 @@ If (!$Conexao_db = FWA_Conexao("OpcTec")) { //Conectando-se ao banco de dados
 
         // Excluir lançamento contábil vinculado ao pagamento
         try {
-            $lancamento = new LancamentosContabeis();
+            $lancamento = new Lancamentos();
             $lancamento->setCodEvento($FWS_['cod_evento']);
             $lancamento->setCodPagamento($FWS_['cod_pagamento']);
             $lancamento->excluirByCodPagamento();

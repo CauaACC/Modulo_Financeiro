@@ -97,10 +97,10 @@ class RateiosDAO extends DAO{
             LEFT JOIN fin_centro_custo AS fcc ON fcc.cod_centro_custo = fr.cod_centro_custo AND fcc.cod_evento = fr.cod_evento
             WHERE fr.cod_evento=\'%s\'
             ORDER BY
-              CAST(SUBSTRING_INDEX(fr.codigo_contabil_rateio, \'.\', 1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_contabil_rateio, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_contabil_rateio, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_contabil_rateio, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
+              CAST(SUBSTRING_INDEX(fr.codigo_financeiro_rateio, \'.\', 1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_financeiro_rateio, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_financeiro_rateio, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fr.codigo_financeiro_rateio, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -147,7 +147,7 @@ class RateiosDAO extends DAO{
             return false;
         }
     }
-    public function gerarCodigoContabilRateio(Rateios $obj, $debug = false) {
+    public function gerarCodigoFinanceiroRateio(Rateios $obj, $debug = false) {
         try {
 
             $this->conex->debug = $debug;
@@ -158,17 +158,17 @@ class RateiosDAO extends DAO{
             if ($obj->getCodRateioPrincipal() == null) {
 
                 $sql = sprintf(
-                    "SELECT MAX(CAST(codigo_contabil_rateio AS UNSIGNED))
+                    "SELECT MAX(CAST(codigo_financeiro_rateio AS UNSIGNED))
                     FROM fin_rateios
                     WHERE cod_evento = '%s' AND (cod_rateio_principal IS NULL OR cod_rateio_principal = '')",
                     $obj->getCodEvento()
                 );
 
                 $ultimoCodigo = $this->conex->GetOne($sql);
-                $codigoContabilRateio = ($ultimoCodigo ? $ultimoCodigo : 0) + 1;
+                $codigoFinanceiroRateio = ($ultimoCodigo ? $ultimoCodigo : 0) + 1;
 
                 return [
-                    'codigo_contabil_rateio' => (string)$codigoContabilRateio
+                    'codigo_financeiro_rateio' => (string)$codigoFinanceiroRateio
                 ];
             }
 
@@ -178,7 +178,7 @@ class RateiosDAO extends DAO{
 
             // Buscar código contábil do pai
             $sql = sprintf(
-                "SELECT codigo_contabil_rateio
+                "SELECT codigo_financeiro_rateio
                 FROM fin_rateios
                 WHERE cod_rateio = '%s' AND cod_evento = '%s'",
                 $obj->getCodRateioPrincipal(),
@@ -194,7 +194,7 @@ class RateiosDAO extends DAO{
             // Buscar maior nível entre os filhos
             $sql = sprintf(
                 "SELECT MAX(
-                    CAST(SUBSTRING_INDEX(codigo_contabil_rateio, '.', -1) AS UNSIGNED)
+                    CAST(SUBSTRING_INDEX(codigo_financeiro_rateio, '.', -1) AS UNSIGNED)
                 )
                 FROM fin_rateios
                 WHERE cod_rateio_principal = '%s' AND cod_evento = '%s'",
@@ -206,10 +206,10 @@ class RateiosDAO extends DAO{
             $proximoNivel = ($ultimoNivel ? $ultimoNivel : 0) + 1;
 
             // Montar novo código contábil
-            $codigoContabilRateio = $codigoPai . '.' . $proximoNivel;
+            $codigoFinanceiroRateio = $codigoPai . '.' . $proximoNivel;
 
             return [
-                'codigo_contabil_rateio' => $codigoContabilRateio
+                'codigo_financeiro_rateio' => $codigoFinanceiroRateio
             ];
         } catch (ADODB_Exception $e) {
             $this->enviarMensagem($e);
@@ -275,8 +275,8 @@ class RateiosDAO extends DAO{
             $obj->setHttpUserAgent($_SERVER['HTTP_USER_AGENT']);
             $obj->setVersao(1);
             $obj->setStatus('ATIVADA');
-            $dados = $this->gerarCodigoContabilRateio($obj);
-            $obj->setCodigoContabilRateio($dados['codigo_contabil_rateio']);
+            $dados = $this->gerarCodigoFinanceiroRateio($obj);
+            $obj->setCodigoFinanceiroRateio($dados['codigo_financeiro_rateio']);
             
                         
             $sql = "SELECT * FROM fin_rateios 

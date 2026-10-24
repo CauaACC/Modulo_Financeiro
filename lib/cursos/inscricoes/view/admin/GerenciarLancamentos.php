@@ -10,7 +10,7 @@ if (!FWA_Autenticacao($_SESSION['_cod_usuario'], enumSistema::SIS_CONTROLE_FINAN
     exit;
 }
 
-$objSRV = new GerenciarLancamentosContabeisAC();
+$objSRV = new GerenciarLancamentosAC();
 ?>
 <script type="text/javascript" src="resources/js/jquery/jquery.form.js"></script>
 <script type="text/javascript" src="resources/js/jquery/jquery.price_format.1.7.min.js"></script>
@@ -70,22 +70,22 @@ $objSRV = new GerenciarLancamentosContabeisAC();
         // Filtro vindo de link (aba Duplicidades): aplica ja na abertura
         lerFiltroDaUrl();
         if (_filtroLink.pedido || _filtroLink.inscrito || _filtroLink.pagamento) {
-            carregarTabelaLancamentosContabeis();
+            carregarTabelaLancamentos();
         }
 
         // Filtros: select aplica na hora; na busca livre espera o Enter
         $('#fPlanoContas, #fTipo, #fOrigem, #fConciliado, #fDataInicio, #fDataFim').change(function() {
-            carregarTabelaLancamentosContabeis();
+            carregarTabelaLancamentos();
         });
         $('#fBusca').keypress(function(e) {
             if (e.which === 13) {
                 e.preventDefault();
-                carregarTabelaLancamentosContabeis();
+                carregarTabelaLancamentos();
             }
         });
 
         $('#btnSalvar').click(function() {
-            salvarLancamentosContabeis();
+            salvarLancamentos();
         });
 
         $('#tipoLancamento').change(function () {
@@ -157,7 +157,7 @@ $objSRV = new GerenciarLancamentosContabeisAC();
     function bindEventosTabela() {
         $('.editar').off('click').on('click', function() {
             var id = $(this).parents("tr").attr("id");
-            editarLancamentosContabeis(id);
+            editarLancamentos(id);
         });
         $('.excluir').off('click').on('click', function() {
             _codExcluir = $(this).parents("tr").attr("id");
@@ -234,15 +234,15 @@ $objSRV = new GerenciarLancamentosContabeisAC();
     function sairFiltroLink() {
         _filtroLink = {inscrito: '', pagamento: '', pedido: ''};
         mostrarAvisoFiltroLink();
-        carregarTabelaLancamentosContabeis();
+        carregarTabelaLancamentos();
     }
 
     // Os filtros vao junto em toda recarga da tabela -- inclusive depois de
     // salvar/excluir, para o usuario nao perder o recorte em que estava.
     function filtrosAtuais() {
         return {
-            'c': 'GerenciarLancamentosContabeis',
-            'm': 'carregarTabelaLancamentosContabeis',
+            'c': 'GerenciarLancamentos',
+            'm': 'carregarTabelaLancamentos',
             '_submit_check': '1',
             'dataInicio': $('#fDataInicio').val() || '',
             'dataFim': $('#fDataFim').val() || '',
@@ -262,10 +262,10 @@ $objSRV = new GerenciarLancamentosContabeisAC();
         $('#fPlanoContas, #fTipo, #fOrigem, #fConciliado').val('');
         _filtroLink = {inscrito: '', pagamento: '', pedido: ''};
         mostrarAvisoFiltroLink();
-        carregarTabelaLancamentosContabeis();
+        carregarTabelaLancamentos();
     }
 
-    function carregarTabelaLancamentosContabeis() {
+    function carregarTabelaLancamentos() {
         $.post('<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
             filtrosAtuais(),
             function(html) {
@@ -277,8 +277,8 @@ $objSRV = new GerenciarLancamentosContabeisAC();
         );
     }
 
-    function salvarLancamentosContabeis() {
-        $('#formLancamentosContabeis').ajaxSubmit({
+    function salvarLancamentos() {
+        $('#formLancamentos').ajaxSubmit({
             target: '#modalLancamentoMsg',
             dataType: 'json',
             async: false,
@@ -289,7 +289,7 @@ $objSRV = new GerenciarLancamentosContabeisAC();
             success: function(data) {
                 processJson(data);
                 if (data.statusMessage) {
-                    carregarTabelaLancamentosContabeis();
+                    carregarTabelaLancamentos();
                     $('#modalLancamento').modal('hide');
                     limparCampos();
                 }
@@ -298,12 +298,12 @@ $objSRV = new GerenciarLancamentosContabeisAC();
         });
     }
 
-    function editarLancamentosContabeis(codLancamentosContabeis) {
-        if (!codLancamentosContabeis) return;
+    function editarLancamentos(codLancamentos) {
+        if (!codLancamentos) return;
         $.ajax({
             type: "POST",
             url: '<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            data: {'codLancamentosContabeis': codLancamentosContabeis, 'c': 'GerenciarLancamentosContabeis', 'm': 'editarLancamentosContabeis', '_submit_check': '1'},
+            data: {'codLancamentos': codLancamentos, 'c': 'GerenciarLancamentos', 'm': 'editarLancamentos', '_submit_check': '1'},
             dataType: "json",
             async: false,
             cache: false,
@@ -321,7 +321,7 @@ $objSRV = new GerenciarLancamentosContabeisAC();
                     $('#campoCredito').hide();
                     $('#debito').prop('required', true);
                 }
-                $('#codLancamentosContabeis').val(data.codLancamentosContabeis);
+                $('#codLancamentos').val(data.codLancamentos);
                 $('#historico').val(data.historico);
                 $('#origemLancamento').val(data.origemLancamento);
                 $('#valor').val(data.valor);
@@ -331,8 +331,8 @@ $objSRV = new GerenciarLancamentosContabeisAC();
                 $('#comprovante').val('');
                 if (data.arquivoComprovante) {
                     $('#comprovanteAtual').html('<i class="fa fa-paperclip"></i> anexado: '
-                        + '<a href="<?php echo WB_URL_COMMAND ?>&c=GerenciarLancamentosContabeis&m=baixarComprovante&codLancamentosContabeis='
-                        + data.codLancamentosContabeis + '&_submit_check=1" target="_blank">ver</a>'
+                        + '<a href="<?php echo WB_URL_COMMAND ?>&c=GerenciarLancamentos&m=baixarComprovante&codLancamentos='
+                        + data.codLancamentos + '&_submit_check=1" target="_blank">ver</a>'
                         + ' <span style="color:#999;">(envie outro para substituir)</span>');
                 } else {
                     $('#comprovanteAtual').html('');
@@ -360,12 +360,12 @@ $objSRV = new GerenciarLancamentosContabeisAC();
     // vem vazio. Util para repetir conta/centro/fonte/favorecido.
     // O comprovante NAO e copiado: o arquivo pertence ao lancamento original.
     function salvarComoNovo() {
-        if (!$('#codLancamentosContabeis').val()) return;
-        $('#codLancamentosContabeis').val('');
+        if (!$('#codLancamentos').val()) return;
+        $('#codLancamentos').val('');
         $('#comprovanteAtual').html('');
         $('#modalLancamentoLabel').html('<i class="fa fa-files-o" style="margin-right:8px; opacity:0.8;"></i>Novo Lançamento (a partir de outro)');
         $('#btnSalvarComoNovo').hide();
-        salvarLancamentosContabeis();
+        salvarLancamentos();
     }
 
     function confirmarExclusao() {
@@ -373,14 +373,14 @@ $objSRV = new GerenciarLancamentosContabeisAC();
         $.ajax({
             type: "POST",
             url: '<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            data: {'codLancamentosContabeis': _codExcluir, 'c': 'GerenciarLancamentosContabeis', 'm': 'excluirLancamentosContabeis', '_submit_check': '1'},
+            data: {'codLancamentos': _codExcluir, 'c': 'GerenciarLancamentos', 'm': 'excluirLancamentos', '_submit_check': '1'},
             dataType: "json",
             async: false,
             cache: false,
             beforeSend: function() { startLoading(); },
             success: function(data) {
                 processJson(data);
-                if (data.statusMessage) { carregarTabelaLancamentosContabeis(); }
+                if (data.statusMessage) { carregarTabelaLancamentos(); }
                 $('#modalExclusao').modal('hide');
                 _codExcluir = null;
             },
@@ -390,7 +390,7 @@ $objSRV = new GerenciarLancamentosContabeisAC();
 
     function limparCampos() {
         esconderLimparCD();
-        $('#codLancamentosContabeis').val('');
+        $('#codLancamentos').val('');
         $('#tipoLancamento').val('');
         $('#valor').val('');
         $('#dataFinanceira').val('');
@@ -413,17 +413,17 @@ $objSRV = new GerenciarLancamentosContabeisAC();
         $.ajax({
             type: "POST",
             url: '<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            data: {'c': 'GerenciarContabilizacao', 'm': 'situacaoContabilizacao', '_submit_check': '1'},
+            data: {'c': 'GerenciarMotorFinanceiro', 'm': 'situacaoMotor', '_submit_check': '1'},
             dataType: "json",
             cache: false,
             success: function(data) {
                 if (!data.statusMessage || !data.dados.temLancamentos) { return; }
                 var d = data.dados, partes = [];
                 if (d.pagamentosNovos > 0) {
-                    partes.push('<strong>' + d.pagamentosNovos + '</strong> pagamento(s) ainda n&atilde;o contabilizado(s)');
+                    partes.push('<strong>' + d.pagamentosNovos + '</strong> pagamento(s) ainda n&atilde;o lancado(s)');
                 }
                 if (d.regrasAlteradas) {
-                    partes.push('as <strong>regras de rateio mudaram</strong> depois da &uacute;ltima contabiliza&ccedil;&atilde;o');
+                    partes.push('as <strong>regras de rateio mudaram</strong> depois da &uacute;ltima gera&ccedil;&atilde;o');
                 }
                 if (!partes.length) { return; }
                 var txt = 'O balancete est&aacute; desatualizado: ' + partes.join(' e ') + '.';
@@ -433,8 +433,8 @@ $objSRV = new GerenciarLancamentosContabeisAC();
                 // regra alterada exige refazer; pagamento novo so precisa do incremental
                 var modo = d.regrasAlteradas ? 'completo' : 'incremental';
                 $('#avisoTexto').html(txt);
-                $('#avisoAcao').text(d.regrasAlteradas ? 'Refazer tudo agora' : 'Contabilizar agora')
-                               .off('click').on('click', function() { abrirContabilizacao(modo); });
+                $('#avisoAcao').text(d.regrasAlteradas ? 'Refazer tudo agora' : 'Gerar Lancamento agora')
+                               .off('click').on('click', function() { abrirMotor(modo); });
                 $('#avisoDesatualizado').show();
             }
         });
@@ -445,7 +445,7 @@ $objSRV = new GerenciarLancamentosContabeisAC();
 
     function verificarFechamento() {
         $.post('<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            {'c': 'GerenciarLancamentosContabeis', 'm': 'situacaoFechamento', '_submit_check': '1'},
+            {'c': 'GerenciarLancamentos', 'm': 'situacaoFechamento', '_submit_check': '1'},
             function(data) {
                 _dataFechamento = data.dataFechamento || null;
                 if (_dataFechamento) {
@@ -470,34 +470,34 @@ $objSRV = new GerenciarLancamentosContabeisAC();
             if (p.length === 3) { d = p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0'); }
         }
         $.post('<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            {'c': 'GerenciarLancamentosContabeis', 'm': 'definirFechamento', 'dataFechamento': d, '_submit_check': '1'},
+            {'c': 'GerenciarLancamentos', 'm': 'definirFechamento', 'dataFechamento': d, '_submit_check': '1'},
             function(data) {
                 processJson(data);
                 verificarFechamento();
-                carregarTabelaLancamentosContabeis();
+                carregarTabelaLancamentos();
             }, 'json');
     }
 
-    // ---------------------------------------------- contabilizacao automatica
+    // ---------------------------------------------- geracao de lancamentos automatica
     function fmtMoeda(v) {
         return 'R$ ' + (parseFloat(v) || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
-    var _modoContab = 'incremental';
+    var _modoMotor = 'incremental';
 
     // Refazer e destrutivo: nao fica junto das acoes do dia a dia. Chega-se
     // nele por aqui, e ainda assim so executa apos marcar o aceite.
     function irParaRefazer() {
-        $('#modalContabilizacao').modal('hide');
-        setTimeout(function() { abrirContabilizacao('completo'); }, 400);
+        $('#modalMotor').modal('hide');
+        setTimeout(function() { abrirMotor('completo'); }, 400);
     }
 
-    function abrirContabilizacao(modo) {
-        _modoContab = modo || 'incremental';
+    function abrirMotor(modo) {
+        _modoMotor = modo || 'incremental';
         $.ajax({
             type: "POST",
             url: '<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            data: {'c': 'GerenciarContabilizacao', 'm': 'previaContabilizacao', '_submit_check': '1', 'modo': _modoContab},
+            data: {'c': 'GerenciarMotorFinanceiro', 'm': 'previaLancamentos', '_submit_check': '1', 'modo': _modoMotor},
             dataType: "json",
             cache: false,
             beforeSend: function() { startLoading(); },
@@ -505,11 +505,11 @@ $objSRV = new GerenciarLancamentosContabeisAC();
                 if (!data.statusMessage) { processJson(data); return; }
                 var r = data.resumo;
                 var html = ''
-                    + (_modoContab === 'completo'
+                    + (_modoMotor === 'completo'
                         ? '<p style="margin-bottom:12px;">Todos os lan&ccedil;amentos autom&aacute;ticos ser&atilde;o <strong>apagados e refeitos</strong> com as regras atuais:</p>'
-                        : '<p style="margin-bottom:12px;">Ser&atilde;o lan&ccedil;ados apenas os pagamentos <strong>ainda n&atilde;o contabilizados</strong> &mdash; o que j&aacute; est&aacute; gravado n&atilde;o &eacute; tocado:</p>')
+                        : '<p style="margin-bottom:12px;">Ser&atilde;o lan&ccedil;ados apenas os pagamentos <strong>ainda n&atilde;o lancados</strong> &mdash; o que j&aacute; est&aacute; gravado n&atilde;o &eacute; tocado:</p>')
                     + '<table class="tbl-fin" style="font-size:13px;"><tbody>'
-                    + '<tr><td>Pagamentos a contabilizar</td><td style="text-align:right;font-weight:600;">' + r.pagamentos + '</td></tr>'
+                    + '<tr><td>Pagamentos a gerar lancamento</td><td style="text-align:right;font-weight:600;">' + r.pagamentos + '</td></tr>'
                     + '<tr><td>Receita bruta<br><span style="color:#999;font-size:11px;">' + (r.conta_receita || '') + '</span></td><td style="text-align:right;font-weight:600;">' + fmtMoeda(r.receita) + '</td></tr>'
                     + '<tr><td>Taxa do meio de pagamento<br><span style="color:#999;font-size:11px;">' + (r.conta_taxa || '') + '</span></td><td style="text-align:right;font-weight:600;">' + fmtMoeda(r.taxa) + '</td></tr>'
                     + (r.institucional > 0
@@ -530,11 +530,11 @@ $objSRV = new GerenciarLancamentosContabeisAC();
                           + r.sem_regra_taxa + ' pagamento(s) sem regra de taxa cadastrada em Rateios &mdash; ser&atilde;o lan&ccedil;ados sem dedu&ccedil;&atilde;o.</p>';
                 }
                 html += '<p style="margin-top:6px;color:#777;font-size:12px;">Devolu&ccedil;&otilde;es n&atilde;o s&atilde;o geradas automaticamente (o valor devolvido costuma ser diferente do pago) &mdash; lance manualmente na rubrica de devolu&ccedil;&atilde;o do evento.</p>';
-                html += _modoContab === 'completo'
+                html += _modoMotor === 'completo'
                     ? '<p style="margin-top:12px;color:#777;font-size:12px;">Os lan&ccedil;amentos autom&aacute;ticos anteriores (n&atilde;o conciliados) ser&atilde;o substitu&iacute;dos. Lan&ccedil;amentos manuais e conciliados n&atilde;o s&atilde;o afetados.</p>'
                     : '<p style="margin-top:12px;color:#777;font-size:12px;">Nada do que j&aacute; foi lan&ccedil;ado ser&aacute; apagado. '
                       + '<a href="javascript:void(0)" onclick="irParaRefazer()" style="color:#a33;">Alterei uma regra e preciso refazer tudo</a></p>';
-                if (_modoContab === 'completo') {
+                if (_modoMotor === 'completo') {
                     html += '<div style="margin-top:14px; border:1px solid #f0c8c8; background:#fdf4f4; border-radius:8px; padding:12px 14px;">'
                           + '<div style="color:#a33; font-weight:600; font-size:13px; margin-bottom:6px;">'
                           + '<i class="fa fa-exclamation-triangle"></i> Isto apaga os lan&ccedil;amentos autom&aacute;ticos existentes e os cria de novo.</div>'
@@ -542,37 +542,37 @@ $objSRV = new GerenciarLancamentosContabeisAC();
                           + '<label style="font-weight:400; font-size:13px; color:#a33;"><input type="checkbox" id="confirmaRefazer"> Entendi, pode apagar e refazer</label>'
                           + '</div>';
                 }
-                $('#contabilizacaoResumo').html(html);
-                if (_modoContab === 'completo') {
-                    $('#btnConfirmarContab').prop('disabled', true).text('Apagar e refazer');
+                $('#resumoMotor').html(html);
+                if (_modoMotor === 'completo') {
+                    $('#btnConfirmarMotor').prop('disabled', true).text('Apagar e refazer');
                     $('#confirmaRefazer').change(function() {
-                        $('#btnConfirmarContab').prop('disabled', !$(this).is(':checked'));
+                        $('#btnConfirmarMotor').prop('disabled', !$(this).is(':checked'));
                     });
                 } else {
-                    $('#btnConfirmarContab').prop('disabled', false).text('Gerar lançamentos');
+                    $('#btnConfirmarMotor').prop('disabled', false).text('Gerar lançamentos');
                 }
-                $('#modalContabilizacao').modal('show');
+                $('#modalMotor').modal('show');
             },
             complete: function() { stopLoading(); }
         });
     }
 
-    function confirmarContabilizacao() {
-        if (_modoContab === 'completo' && !$('#confirmaRefazer').is(':checked')) {
+    function confirmarMotor() {
+        if (_modoMotor === 'completo' && !$('#confirmaRefazer').is(':checked')) {
             return;
         }
         $.ajax({
             type: "POST",
             url: '<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            data: {'c': 'GerenciarContabilizacao', 'm': 'contabilizarPagamentos', '_submit_check': '1', 'modo': _modoContab},
+            data: {'c': 'GerenciarMotorFinanceiro', 'm': 'gerarLancamentosPagamentos', '_submit_check': '1', 'modo': _modoMotor},
             dataType: "json",
             cache: false,
             beforeSend: function() { startLoading(); },
             success: function(data) {
                 processJson(data);
-                $('#modalContabilizacao').modal('hide');
+                $('#modalMotor').modal('hide');
                 if (data.statusMessage) {
-                    carregarTabelaLancamentosContabeis();
+                    carregarTabelaLancamentos();
                     $('#avisoDesatualizado').hide();
                     verificarSituacao();
         verificarFechamento();
@@ -597,15 +597,15 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
 <div id="avisoDesatualizado" style="display:none; background:#fdf6e3; border:1px solid #f0e0b0; color:#8a6d3b; border-radius:10px; padding:12px 16px; margin-top:10px; font-size:13px;">
     <i class="fa fa-exclamation-triangle" style="margin-right:6px;"></i>
     <span id="avisoTexto"></span>
-    <a href="javascript:void(0)" id="avisoAcao" style="margin-left:8px; font-weight:600;">Contabilizar agora</a>
+    <a href="javascript:void(0)" id="avisoAcao" style="margin-left:8px; font-weight:600;">Gerar Lancamento agora</a>
 </div>
 
 <div style="background:#fff; border:1px solid #e8e8e8; border-radius:12px; overflow:hidden; margin-top:10px;">
     <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 20px; border-bottom:1px solid #eee;">
         <h4 style="margin:0; font-size:15px; font-weight:600; color:#333;">Gerenciar Lançamentos</h4>
         <div>
-            <button type="button" class="btn btn-sm" style="margin-right:6px;" onclick="abrirContabilizacao('incremental')" title="Lança apenas os pagamentos ainda não contabilizados">
-                <i class="fa fa-refresh"></i> Contabilizar pagamentos
+            <button type="button" class="btn btn-sm" style="margin-right:6px;" onclick="abrirMotor('incremental')" title="Lança apenas os pagamentos ainda não lancados">
+                <i class="fa fa-refresh"></i> Motor Financeiro
             </button>
             <button type="button" class="btn btn-sm" style="margin-right:6px;" onclick="abrirFechamento()" title="Trava lançamentos até uma data (período já prestado)">
                 <i class="fa fa-lock"></i> <span id="btnFechamentoLabel">Fechar período</span>
@@ -626,7 +626,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
     </div>
 
     <!-- Filtros: a lista traz todos os lancamentos do evento (centenas depois de
-         contabilizar), entao sem filtro nao ha como trabalhar. -->
+         gerar lancamento), entao sem filtro nao ha como trabalhar. -->
     <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; padding:12px 20px; border-bottom:1px solid #eee; background:#fafafa;">
         <div>
             <label for="fDataInicio" style="display:block; margin:0 0 2px; font-size:11px; color:#666; font-weight:600;">COMPETÊNCIA DE</label>
@@ -675,7 +675,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
             <input type="text" id="fBusca" class="form-control" placeholder="Digite e tecle Enter">
         </div>
         <div>
-            <button type="button" class="btn btn-sm" onclick="carregarTabelaLancamentosContabeis()" title="Aplica os filtros">
+            <button type="button" class="btn btn-sm" onclick="carregarTabelaLancamentos()" title="Aplica os filtros">
                 <i class="fa fa-search"></i> Filtrar
             </button>
             <button type="button" class="btn btn-sm" onclick="limparFiltros()" title="Limpa os filtros e mostra tudo">
@@ -701,7 +701,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
             </thead>
             <tbody class="inputs">
                 <?php
-                $objSRV->carregarTabelaLancamentosContabeis($fws_, $debug);
+                $objSRV->carregarTabelaLancamentos($fws_, $debug);
                 ?>
             </tbody>
         </table>
@@ -720,7 +720,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
             </div>
             <div class="modal-body">
                 <div id="modalLancamentoMsg"></div>
-                <form id="formLancamentosContabeis" name="formLancamentosContabeis" action="<?php echo WB_URL_COMMAND ?>&dummy=" method="post" enctype="multipart/form-data">
+                <form id="formLancamentos" name="formLancamentos" action="<?php echo WB_URL_COMMAND ?>&dummy=" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
@@ -856,9 +856,9 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
                         <textarea id="historico" name="historico" class="form-control" placeholder="Descrição" required></textarea>
                     </div>
                     <input type="hidden" value="1" name="_submit_check">
-                    <input type="hidden" value="GerenciarLancamentosContabeis" name="c">
-                    <input type="hidden" value="salvarLancamentosContabeis" name="m">
-                    <input type="hidden" name="codLancamentosContabeis" id="codLancamentosContabeis" value=""/>
+                    <input type="hidden" value="GerenciarLancamentos" name="c">
+                    <input type="hidden" value="salvarLancamentos" name="m">
+                    <input type="hidden" name="codLancamentos" id="codLancamentos" value=""/>
                 </form>
             </div>
             <div class="modal-footer modalRodape">
@@ -896,18 +896,18 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
     </div>
 </div>
 
-<!-- Modal Contabilização automática -->
-<div class="modal fade" id="modalContabilizacao" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+<!-- Modal Motor Financeiro -->
+<div class="modal fade" id="modalMotor" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog" role="document" style="max-width:520px;">
         <div class="modal-content">
             <div class="modal-header modalCabecalho">
-                <h4 class="modal-title"><i class="fa fa-refresh" style="margin-right:8px; opacity:0.8;"></i>Contabilizar pagamentos</h4>
+                <h4 class="modal-title"><i class="fa fa-refresh" style="margin-right:8px; opacity:0.8;"></i>Motor Financeiro</h4>
                 <button type="button" class="close modalBtnFechar" data-dismiss="modal"><span>&times;</span></button>
             </div>
-            <div class="modal-body" id="contabilizacaoResumo"></div>
+            <div class="modal-body" id="resumoMotor"></div>
             <div class="modal-footer modalRodape">
                 <button type="button" class="btn btn-default modalBtnCancelar" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnConfirmarContab" onclick="confirmarContabilizacao()">Gerar lançamentos</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmarMotor" onclick="confirmarMotor()">Gerar lançamentos</button>
             </div>
         </div>
     </div>

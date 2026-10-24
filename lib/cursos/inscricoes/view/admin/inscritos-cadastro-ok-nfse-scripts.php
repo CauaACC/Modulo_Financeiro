@@ -1108,7 +1108,7 @@ if (isset($objEmissorNfse) && trim((string) $objEmissorNfse->getAmbiente()) !== 
                 <div class="form-group">
                     <label for="envioCopia">Enviar cópia para <small style="font-weight:normal; color:#999;">(opcional)</small></label>
                     <input type="text" class="form-control" id="envioCopia" maxlength="500"
-                           placeholder="financeiro@empresa.com.br, contabil@empresa.com.br">
+                           placeholder="financeiro@empresa.com.br, financeiro@empresa.com.br">
                     <small class="text-muted">Vários endereços separados por vírgula. Fica guardado
                         para as próximas notas deste cliente.</small>
                 </div>

@@ -67,7 +67,7 @@ if (!FWA_Autenticacao($_SESSION['_cod_usuario'], enumSistema::SIS_CONTROLE_FINAN
         $.ajax({
             type: "POST",
             url: '<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            data: {'c': 'GerenciarCatalogoContabil', 'm': 'listarOrigens', '_submit_check': '1'},
+            data: {'c': 'GerenciarCatalogo', 'm': 'listarOrigens', '_submit_check': '1'},
             dataType: "json",
             cache: false,
             beforeSend: function() { startLoading(); },
@@ -109,7 +109,7 @@ if (!FWA_Autenticacao($_SESSION['_cod_usuario'], enumSistema::SIS_CONTROLE_FINAN
         $.ajax({
             type: "POST",
             url: '<?php echo WB_URL_COMMAND ?>&t=' + Math.random(),
-            data: {'c': 'GerenciarCatalogoContabil', 'm': 'detalharOrigem', '_submit_check': '1',
+            data: {'c': 'GerenciarCatalogo', 'm': 'detalharOrigem', '_submit_check': '1',
                    'codEventoOrigem': (codOrigem && codOrigem !== 'PADRAO') ? codOrigem : ''},
             dataType: "json",
             cache: false,
@@ -152,7 +152,7 @@ if (!FWA_Autenticacao($_SESSION['_cod_usuario'], enumSistema::SIS_CONTROLE_FINAN
 
     function executar(metodo) {
         var dados = {
-            'c': 'GerenciarCatalogoContabil',
+            'c': 'GerenciarCatalogo',
             'm': metodo,
             '_submit_check': '1',
             'codEventoOrigem': $('#codEventoOrigem').val() === 'PADRAO' ? '' : $('#codEventoOrigem').val(),
@@ -193,7 +193,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
 
 <div class="cfg-card">
     <div class="cfg-card-head">
-        <h4>Configuração inicial da contabilidade</h4>
+        <h4>Configuração inicial da financeiro</h4>
     </div>
     <div class="cfg-body">
 
@@ -241,7 +241,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
             <a class="btn btn-default btn-sm" href="index.php?content=view/admin/GerenciarCentroCusto.php">Centro de Custo</a>
             <a class="btn btn-default btn-sm" href="index.php?content=view/admin/GerenciarRateios.php">Rateios</a>
             <a class="btn btn-default btn-sm" href="index.php?content=view/admin/GerenciarFontesRecurso.php">Fontes de Recurso</a>
-            <a class="btn btn-primary btn-sm" href="index.php?content=view/admin/GerenciarLancamentosContabeis.php">Lan&ccedil;amentos</a>
+            <a class="btn btn-primary btn-sm" href="index.php?content=view/admin/GerenciarLancamentos.php">Lan&ccedil;amentos</a>
         </div>
 
 

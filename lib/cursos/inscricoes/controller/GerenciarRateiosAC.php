@@ -33,7 +33,7 @@ class GerenciarRateiosAC {
                   "codRateioPrincipal": "' . $obj->getCodRateioPrincipal() . '",
                   "codCentroCusto": "' . $obj->getCodCentroCusto() . '",
                   "nomeRateio":"' . tratarJson($obj->getNomeRateio()) . '",
-                  "codigoContabilRateio":"' . tratarJson($obj->getCodigoContabilRateio()) . '",
+                  "codigoFinanceiroRateio":"' . tratarJson($obj->getCodigoFinanceiroRateio()) . '",
                   "percentual":"' . $obj->getPercentual() . '",
                   "descricao":"' . tratarJson($obj->getDescricao()) . '",
                   "status":"' . $obj->getStatus() . '"
@@ -101,7 +101,7 @@ class GerenciarRateiosAC {
                 $ii++;
                 $ehFilho = ($objL->getCodRateioPrincipal() != null && $objL->getCodRateioPrincipal() != '');
                 $classeHierarquia = $ehFilho ? 'rateio-filho' : 'rateio-pai';
-                $codigo = $objL->getCodigoContabilRateio();
+                $codigo = $objL->getCodigoFinanceiroRateio();
                 $nivel = $codigo ? substr_count($codigo, '.') : 0;
                 ?>
                 <tr id="<?php echo  $objL->getCodRateio() ?>" data-cod-rateio-principal="<?php echo $objL->getCodRateioPrincipal() ?>" class="<?php echo $classeHierarquia ?>">

@@ -115,7 +115,7 @@ class GestorDAO extends DAO{
     /**
      * E-mail do financeiro do gestor dono do evento.
      * O vinculo evento->gestor e por NOME (tab_eventos.gestor VARCHAR x
-     * sis_gestor.nome_gestor), mesmo JOIN de GerenciarCatalogoContabilAC::resolverGestor().
+     * sis_gestor.nome_gestor), mesmo JOIN de GerenciarCatalogoAC::resolverGestor().
      * @return string|null e-mail ou null quando nao ha gestor/e-mail cadastrado
      */
     public function getEmailFinanceiroByEvento($codEvento, $debug=false) {

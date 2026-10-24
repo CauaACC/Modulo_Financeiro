@@ -95,10 +95,10 @@ class CentroCustoDAO extends DAO{
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fcc.cod_gestor
             WHERE fcc.cod_evento=\'%s\'
             ORDER BY
-              CAST(SUBSTRING_INDEX(fcc.codigo_contabil, \'.\', 1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
+              CAST(SUBSTRING_INDEX(fcc.codigo_financeiro, \'.\', 1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_financeiro, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_financeiro, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_financeiro, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -125,10 +125,10 @@ class CentroCustoDAO extends DAO{
             LEFT JOIN sis_gestor AS sg ON sg.cod_gestor = fcc.cod_gestor
             WHERE fcc.cod_evento=\'%s\'
             ORDER BY
-              CAST(SUBSTRING_INDEX(fcc.codigo_contabil, \'.\', 1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
-              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_contabil, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
+              CAST(SUBSTRING_INDEX(fcc.codigo_financeiro, \'.\', 1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_financeiro, \'.0.0.0\'), \'.\', 2), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_financeiro, \'.0.0.0\'), \'.\', 3), \'.\', -1) AS UNSIGNED),
+              CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(CONCAT(fcc.codigo_financeiro, \'.0.0.0\'), \'.\', 4), \'.\', -1) AS UNSIGNED)
             ', $obj->getCodEvento());
 
             $this->conex->debug = $debug;
@@ -149,26 +149,26 @@ class CentroCustoDAO extends DAO{
             return false;
         }
     }
-    public function gerarCodigoContabil(CentroCusto $obj, $debug = false) {
+    public function gerarCodigoFinanceiro(CentroCusto $obj, $debug = false) {
         try {
 
             $this->conex->debug = $debug;
 
             // Raiz: proximo inteiro
             if ($obj->getCodCentroCustoPai() == null) {
-                $sql = "SELECT MAX(CAST(codigo_contabil AS UNSIGNED))
+                $sql = "SELECT MAX(CAST(codigo_financeiro AS UNSIGNED))
                         FROM fin_centro_custo
                         WHERE cod_centro_custo_pai IS NULL";
 
                 $ultimoCodigo = $this->conex->GetOne($sql);
-                $codigoContabil = ($ultimoCodigo ? $ultimoCodigo : 0) + 1;
+                $codigoFinanceiro = ($ultimoCodigo ? $ultimoCodigo : 0) + 1;
 
-                return ['codigo_contabil' => (string)$codigoContabil];
+                return ['codigo_financeiro' => (string)$codigoFinanceiro];
             }
 
             // Filho: <codigo_do_pai>.<proximo_nivel>
             $sql = sprintf(
-                "SELECT codigo_contabil FROM fin_centro_custo
+                "SELECT codigo_financeiro FROM fin_centro_custo
                  WHERE cod_centro_custo = '%s'",
                 $obj->getCodCentroCustoPai()
             );
@@ -178,7 +178,7 @@ class CentroCustoDAO extends DAO{
             }
 
             $sql = sprintf(
-                "SELECT MAX(CAST(SUBSTRING_INDEX(codigo_contabil, '.', -1) AS UNSIGNED))
+                "SELECT MAX(CAST(SUBSTRING_INDEX(codigo_financeiro, '.', -1) AS UNSIGNED))
                  FROM fin_centro_custo
                  WHERE cod_centro_custo_pai = '%s'",
                 $obj->getCodCentroCustoPai()
@@ -186,7 +186,7 @@ class CentroCustoDAO extends DAO{
             $ultimoNivel = $this->conex->GetOne($sql);
             $proximoNivel = ($ultimoNivel ? $ultimoNivel : 0) + 1;
 
-            return ['codigo_contabil' => $codigoPai . '.' . $proximoNivel];
+            return ['codigo_financeiro' => $codigoPai . '.' . $proximoNivel];
         } catch (ADODB_Exception $e) {
             $this->enviarMensagem($e);
             return false;
@@ -201,10 +201,10 @@ class CentroCustoDAO extends DAO{
             $obj->setHttpUserAgent($_SERVER['HTTP_USER_AGENT']);
             $obj->setVersao(1);
             $obj->setStatus('ATIVADA');
-            // Gera codigo_contabil hierarquico so quando o usuario nao informou
-            if ($obj->getCodigoContabil() === null || trim($obj->getCodigoContabil()) === '') {
-                $dados = $this->gerarCodigoContabil($obj);
-                $obj->setCodigoContabil($dados['codigo_contabil']);
+            // Gera codigo_financeiro hierarquico so quando o usuario nao informou
+            if ($obj->getCodigoFinanceiro() === null || trim($obj->getCodigoFinanceiro()) === '') {
+                $dados = $this->gerarCodigoFinanceiro($obj);
+                $obj->setCodigoFinanceiro($dados['codigo_financeiro']);
             }
             
                         

@@ -98,7 +98,7 @@ class Pagamento extends PagamentoVO {
         $this->validatorEcluir();
         if ($this->objDAO->delete($this, $debug)) {
             try {
-                $lancamento = new LancamentosContabeis();
+                $lancamento = new Lancamentos();
                 $lancamento->setCodEvento($this->getCodEvento());
                 $lancamento->setCodPagamento($this->getCodPagamento());
                 $lancamento->excluirByCodPagamento($debug);
@@ -113,9 +113,9 @@ class Pagamento extends PagamentoVO {
     
     /**
      * Registra o ESTORNO do pagamento: snapshot no espelho de auditoria,
-     * status ESTORNADO e contra-lancamento contabil (debito) espelhando a
+     * status ESTORNADO e contra-lancamento financeiro (debito) espelhando a
      * receita da venda. A devolucao do dinheiro em si e feita FORA do sistema
-     * (painel do gateway/banco) — aqui fica apenas o registro contabil.
+     * (painel do gateway/banco) — aqui fica apenas o registro financeiro.
      */
     public function estornar($debug = false) {
         if ($this->getCodEvento() == '' or $this->getCodPagamento() == '') {
@@ -135,7 +135,7 @@ class Pagamento extends PagamentoVO {
         // Com transacao vinculada e token configurado, o estorno REAL sai
         // daqui; se a API falhar, NADA e registrado. Sem transacao (tesouraria,
         // empenho, manual) ou sem token (ambiente local), fica so o registro
-        // contabil e a devolucao segue manual.
+        // financeiro e a devolucao segue manual.
         $transacaoId = trim((string)$this->getTransacaoId());
         $estornoViaApi = false;
         if ($transacaoId != '' && PagSeguroClient::estornoHabilitado()) {
@@ -186,7 +186,7 @@ class Pagamento extends PagamentoVO {
      * `cod_plano_contas_receita` — o getter magico devolve NULL e este metodo
      * sai sem criar nada, exatamente como ja acontece com o lancamento da
      * VENDA. Enquanto essa origem nao for definida, o estorno grava status +
-     * snapshot, mas NAO gera lancamento contabil.
+     * snapshot, mas NAO gera lancamento financeiro.
      */
     private function criarLancamentoEstorno($debug = false) {
         try {
@@ -196,7 +196,7 @@ class Pagamento extends PagamentoVO {
                 return;
             }
 
-            $lancamento = new LancamentosContabeis();
+            $lancamento = new Lancamentos();
             $lancamento->setCodEvento($this->getCodEvento());
             $lancamento->setCodPagamento($this->getCodPagamento());
             $lancamento->setTipoLancamento('ESTORNO');
@@ -215,7 +215,7 @@ class Pagamento extends PagamentoVO {
         } catch (OKException $e) {
             // lancamento de estorno criado
         } catch (Exception $e) {
-            error_log('[ESTORNO_PAGAMENTO] Falha no lancamento contabil: ' . $e->getMessage());
+            error_log('[ESTORNO_PAGAMENTO] Falha no lancamento financeiro: ' . $e->getMessage());
         }
     }
 
@@ -312,7 +312,7 @@ class Pagamento extends PagamentoVO {
                 return;
             }
 
-            $lancamento = new LancamentosContabeis();
+            $lancamento = new Lancamentos();
             $lancamento->setCodEvento($this->getCodEvento());
             $lancamento->setCodPagamento($this->getCodPagamento());
 

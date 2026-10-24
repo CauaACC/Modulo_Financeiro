@@ -55,7 +55,7 @@ class NotaFiscalEmissorDAO extends DAO {
 
     /**
      * Resolve o emissor a partir do evento. O vinculo evento->gestor e por NOME,
-     * mesmo criterio ja usado na contabilizacao (GerenciarContabilizacaoAC).
+     * mesmo criterio ja usado na geracao de lancamentos (GerenciarMotorFinanceiroAC).
      */
     public function getAtivoByEvento(NotaFiscalEmissor $obj, $codEvento, $debug = false) {
         try {

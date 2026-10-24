@@ -1,6 +1,6 @@
 <?php
 
-class LancamentosContabeisVO extends PadraoVO {
+class LancamentosVO extends PadraoVO {
 
     public function validatorObj() {
         $message = "";
@@ -63,7 +63,7 @@ class LancamentosContabeisVO extends PadraoVO {
             $message .= "Código do evento não foi informado.<br>";
             $return = false;
         }
-        if (is_null($this->getCodLancamentosContabeis()) or $this->getCodLancamentosContabeis() == "") {
+        if (is_null($this->getCodLancamentos()) or $this->getCodLancamentos() == "") {
             $message .= "Código do plano de Contas não foi informado.<br>";
             $return = false;
         }

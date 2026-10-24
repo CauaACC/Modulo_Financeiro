@@ -14,7 +14,7 @@
                         if ($objPCItem->getAceitaLancamento() == 1) {
                             $selected = ($objEvConf->getCodPlanoContasReceita() == $objPCItem->getCodPlanoContas()) ? 'selected' : '';
                             echo "<option value='" . $objPCItem->getCodPlanoContas() . "' " . $selected . ">"
-                                . $objPCItem->getCodigoContabil() . " - " . $objPCItem->getNomePlanoContas()
+                                . $objPCItem->getCodigoFinanceiro() . " - " . $objPCItem->getNomePlanoContas()
                                 . " (" . $objPCItem->getTipoConta() . ")"
                                 . "</option>";
                         }

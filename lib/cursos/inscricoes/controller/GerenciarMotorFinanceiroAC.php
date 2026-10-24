@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Contabilizacao automatica: transforma os pagamentos do evento (tab_pagamentos)
- * em lancamentos contabeis (fin_lancamentos_contabeis), reproduzindo a estrutura
+ * MotorFinanceiro automatica: transforma os pagamentos do evento (tab_pagamentos)
+ * em lancamentos financeiros (fin_lancamentos), reproduzindo a estrutura
  * do balancete da HUTEC:
  *
  *   - 1 credito na conta de receita do evento por pagamento recebido;
@@ -10,7 +10,7 @@
  *     calculada pelas regras cadastradas em fin_rateios
  *     (PIX 1,89% | cartao 3,99% | boleto 3,99% + R$ 1,00).
  *
- * Nenhuma rubrica e procurada por codigo contabil: cada evento pode ter o seu
+ * Nenhuma rubrica e procurada por codigo financeiro: cada evento pode ter o seu
  * proprio plano de contas. A conta de receita sai da conta de origem da regra
  * de Rateios; se o evento so tem uma conta de RECEITA que aceita lancamento, e
  * ela. A conta da taxa sai da conta de destino da regra.
@@ -26,7 +26,7 @@
  * ainda nao conciliados e regera. Lancamentos manuais e conciliados nao sao
  * tocados.
  */
-class GerenciarContabilizacaoAC {
+class GerenciarMotorFinanceiroAC {
 
     const ORIGEM = 'PAGAMENTO_AUTOMATICO';
 
@@ -57,7 +57,7 @@ class GerenciarContabilizacaoAC {
     /**
      * Acao chamada pela tela (AJAX). Devolve JSON com o resumo.
      */
-    public function contabilizarPagamentos($fws_, $debug = false) {
+    public function gerarLancamentosPagamentos($fws_, $debug = false) {
         $ok = false;
         $msg = '';
         $resumo = array();
@@ -68,12 +68,12 @@ class GerenciarContabilizacaoAC {
             // que ja esta gravado -- um pagamento novo nao justifica reescrever
             // centenas de linhas.
             $modo = (isset($fws_['modo']) && $fws_['modo'] == 'completo') ? 'completo' : 'incremental';
-            $resumo = $this->executarContabilizacao($debug, $modo);
+            $resumo = $this->executarMotor($debug, $modo);
             $ok = true;
             $msg = $modo == 'completo'
-                ? sprintf('Contabilizacao refeita: %d pagamento(s), %d lancamento(s).',
+                ? sprintf('MotorFinanceiro refeita: %d pagamento(s), %d lancamento(s).',
                           $resumo['pagamentos'], $resumo['lancamentos'])
-                : sprintf('%d pagamento(s) novo(s) contabilizado(s): %d lancamento(s) acrescentado(s).',
+                : sprintf('%d pagamento(s) novo(s) lancado(s): %d lancamento(s) acrescentado(s).',
                           $resumo['pagamentos'], $resumo['lancamentos']);
         } catch (Exception $e) {
             $msg = $e->getMessage();
@@ -91,7 +91,7 @@ class GerenciarContabilizacaoAC {
     /**
      * Previa: nao grava nada, so mostra o que seria gerado.
      */
-    public function previaContabilizacao($fws_, $debug = false) {
+    public function previaLancamentos($fws_, $debug = false) {
         $ok = false;
         $msg = '';
         $resumo = array();
@@ -116,11 +116,11 @@ class GerenciarContabilizacaoAC {
     /**
      * O balancete esta desatualizado? Duas coisas deixam ele para tras, e
      * nenhuma delas se corrige sozinha:
-     *   - pagamento novo entrou depois da ultima contabilizacao;
+     *   - pagamento novo entrou depois da ultima geracao de lancamentos;
      *   - regra de rateio criada/alterada depois dos lancamentos existentes.
      * Tambem informa quantos lancamentos conciliados nao seriam refeitos.
      */
-    public function situacaoContabilizacao($fws_, $debug = false) {
+    public function situacaoMotor($fws_, $debug = false) {
         $ok = false;
         $msg = '';
         $dados = array('temLancamentos' => false, 'pagamentosNovos' => 0,
@@ -129,7 +129,7 @@ class GerenciarContabilizacaoAC {
         try {
             $sql = sprintf("SELECT COUNT(*) AS total, MAX(data_inclusao) AS ultimo,
                                    SUM(CASE WHEN conciliado = 'SIM' THEN 1 ELSE 0 END) AS conciliados
-                            FROM fin_lancamentos_contabeis
+                            FROM fin_lancamentos
                             WHERE cod_evento = %d AND origem_lancamento = %s",
                            $this->codEvento, $this->conex->qstr(self::ORIGEM));
             $rs = $this->conex->Execute($sql);
@@ -144,7 +144,7 @@ class GerenciarContabilizacaoAC {
                                 WHERE p.cod_evento = %d
                                   AND p.status = 'ATIVADA'
                                   AND p.data_pagamento IS NOT NULL AND p.valor > 0
-                                  AND NOT EXISTS (SELECT 1 FROM fin_lancamentos_contabeis l
+                                  AND NOT EXISTS (SELECT 1 FROM fin_lancamentos l
                                                    WHERE l.cod_evento = p.cod_evento
                                                      AND l.cod_pagamento = p.cod_pagamento)",
                                $this->codEvento);
@@ -173,14 +173,14 @@ class GerenciarContabilizacaoAC {
 
     // ------------------------------------------------------------------ nucleo
 
-    private function executarContabilizacao($debug = false, $modo = 'incremental') {
+    private function executarMotor($debug = false, $modo = 'incremental') {
         $catalogo = $this->carregarCatalogo();
         $pagamentos = $this->carregarPagamentos($modo == 'incremental');
 
         if (empty($pagamentos)) {
             throw new Exception($modo == 'incremental'
-                ? 'Nenhum pagamento novo para contabilizar -- tudo em dia.'
-                : 'Nenhum pagamento pago encontrado neste evento para contabilizar.');
+                ? 'Nenhum pagamento novo para gerar lancamento -- tudo em dia.'
+                : 'Nenhum pagamento pago encontrado neste evento para gerar lancamento.');
         }
 
         $fechamento = $this->dataFechamento();
@@ -197,8 +197,8 @@ class GerenciarContabilizacaoAC {
                 $this->codEvento, $this->conex->qstr(self::ORIGEM), $filtroFech);
 
             $this->conex->debug = $debug;
-            $this->registrarExclusao($onde, 'Reprocessamento completo da contabilizacao');
-            $this->conex->Execute("DELETE FROM fin_lancamentos_contabeis WHERE " . $onde);
+            $this->registrarExclusao($onde, 'Reprocessamento completo da geracao de lancamentos');
+            $this->conex->Execute("DELETE FROM fin_lancamentos WHERE " . $onde);
         }
 
         $linhas = array();
@@ -287,7 +287,7 @@ class GerenciarContabilizacaoAC {
     }
 
     /**
-     * Mesma conta da contabilizacao, mas sem gravar (usado na previa).
+     * Mesma conta da geracao de lancamentos, mas sem gravar (usado na previa).
      */
     private function calcularResumo($debug = false, $modo = 'incremental') {
         $catalogo = $this->carregarCatalogo();
@@ -331,7 +331,7 @@ class GerenciarContabilizacaoAC {
      *
      * A regra anterior deixava CANCELADO/DEVOLVIDO entrar quando o retorno da
      * fundacao trazia o pagamento -- partindo de que o extrato dela provaria a
-     * entrada. No evento 122 isso contabilizou 9 cancelamentos de cartao que
+     * entrada. No evento 122 isso gerou 9 cancelamentos de cartao que
      * nunca liquidaram (no PagSeguro: status "Cancelada", sem taxa retida,
      * liquido = bruto): o retorno veio errado e o sistema o tratou como prova.
      * O status do pagamento e a fonte; o retorno serve para conferir, nao para
@@ -386,14 +386,14 @@ class GerenciarContabilizacaoAC {
         if (empty($ids)) {
             return $resumo;
         }
-        $sql = sprintf("SELECT cod_plano_contas, codigo_contabil, nome_plano_contas
+        $sql = sprintf("SELECT cod_plano_contas, codigo_financeiro, nome_plano_contas
                         FROM fin_plano_contas WHERE cod_plano_contas IN (%s)",
                        implode(',', array_map('intval', $ids)));
         $rs = $this->conex->Execute($sql);
         $nomes = array();
         if ($rs) {
             foreach ($rs as $r) {
-                $nomes[$r['cod_plano_contas']] = trim($r['codigo_contabil'] . ' ' . $r['nome_plano_contas']);
+                $nomes[$r['cod_plano_contas']] = trim($r['codigo_financeiro'] . ' ' . $r['nome_plano_contas']);
             }
         }
         if (isset($ids['receita']) && isset($nomes[$ids['receita']])) {
@@ -413,16 +413,16 @@ class GerenciarContabilizacaoAC {
      */
     private function carregarCatalogo() {
         // Contas de RECEITA que aceitam lancamento. Nao se procura por codigo
-        // contabil: cada evento pode ter o seu proprio plano (um usa 0106
+        // financeiro: cada evento pode ter o seu proprio plano (um usa 0106
         // CURSOS E EVENTOS, outro 0135 MENSALIDADE), entao vale a semantica da
         // propria tabela -- tipo_conta + aceita_lancamento.
         $receitas = array();
-        $sql = sprintf("SELECT cod_plano_contas, codigo_contabil, nome_plano_contas
+        $sql = sprintf("SELECT cod_plano_contas, codigo_financeiro, nome_plano_contas
                         FROM fin_plano_contas
                         WHERE cod_evento = %d AND status = 'ATIVADA'
                           AND tipo_conta = 'RECEITA' AND aceita_lancamento = 1
                           AND natureza_saldo <> 'DEBITO'
-                        ORDER BY codigo_contabil", $this->codEvento);
+                        ORDER BY codigo_financeiro", $this->codEvento);
         $rs = $this->conex->Execute($sql);
         if ($rs) {
             foreach ($rs as $r) {
@@ -435,7 +435,7 @@ class GerenciarContabilizacaoAC {
         $rs = $this->conex->Execute($sql);
         $centro = ($rs && !$rs->EOF) ? $rs->fields['cod_centro_custo'] : null;
         if (!$centro) {
-            throw new Exception('Nenhum centro de custo cadastrado neste evento. Cadastre o projeto em Financeiro &gt; Contabilidade &gt; Centro de Custo.');
+            throw new Exception('Nenhum centro de custo cadastrado neste evento. Cadastre o projeto em Financeiro &gt; Financeiro &gt; Centro de Custo.');
         }
 
         $sql = sprintf("SELECT cod_fontes_recurso FROM fin_fontes_recurso
@@ -478,14 +478,14 @@ class GerenciarContabilizacaoAC {
         if (!$contaReceita) {
             if (empty($receitas)) {
                 throw new Exception('Este evento nao tem nenhuma conta de RECEITA que aceite lancamento. '
-                    . 'Cadastre a rubrica da receita de inscricoes em Financeiro &gt; Contabilidade &gt; Plano de Contas.');
+                    . 'Cadastre a rubrica da receita de inscricoes em Financeiro &gt; Financeiro &gt; Plano de Contas.');
             }
             $nomes = array();
             foreach ($receitas as $r) {
-                $nomes[] = trim($r['codigo_contabil'] . ' ' . $r['nome_plano_contas']);
+                $nomes[] = trim($r['codigo_financeiro'] . ' ' . $r['nome_plano_contas']);
             }
             throw new Exception('Este evento tem mais de uma conta de receita ('
-                . implode(', ', $nomes) . '). Informe em Financeiro &gt; Contabilidade &gt; Rateios, '
+                . implode(', ', $nomes) . '). Informe em Financeiro &gt; Financeiro &gt; Rateios, '
                 . 'na conta de origem da regra, qual delas recebe os pagamentos.');
         }
 
@@ -534,29 +534,29 @@ class GerenciarContabilizacaoAC {
      * Data ate a qual o periodo esta fechado neste evento (ou null).
      */
     /**
-     * Copia para fin_lancamentos_contabeis_excluidos tudo o que o WHERE alcanca,
+     * Copia para fin_lancamentos_excluidos tudo o que o WHERE alcanca,
      * ANTES do DELETE. O balancete nao guarda historico -- e recalculado a cada
      * abertura --, entao sem isso um reprocesso apaga a evidencia do que a tela
      * mostrava antes. Falha aqui nao bloqueia a operacao: se a tabela de log
-     * ainda nao existe no servidor, a contabilizacao segue.
+     * ainda nao existe no servidor, a geracao de lancamentos segue.
      */
     private function registrarExclusao($onde, $motivo) {
         try {
-            $sql = sprintf("INSERT INTO fin_lancamentos_contabeis_excluidos (
-                        cod_lancamentos_contabeis, cod_evento, cod_gestor, cod_centro_custo,
+            $sql = sprintf("INSERT INTO fin_lancamentos_excluidos (
+                        cod_lancamentos, cod_evento, cod_gestor, cod_centro_custo,
                         cod_plano_contas, cod_pagamento, cod_inscrito, favorecido,
                         cod_fontes_recurso, meio_pagamento, data_competencia, data_financeira,
                         tipo_lancamento, flg_lancamento, valor, origem_lancamento, historico,
                         num_documento, arquivo_comprovante, conciliado, data_inclusao,
                         data_alteracao, motivo_exclusao, data_exclusao, id_exclusao,
                         ip_exclusao, session_id_exclusao, http_user_agent_exclusao)
-                    SELECT cod_lancamentos_contabeis, cod_evento, cod_gestor, cod_centro_custo,
+                    SELECT cod_lancamentos, cod_evento, cod_gestor, cod_centro_custo,
                         cod_plano_contas, cod_pagamento, cod_inscrito, favorecido,
                         cod_fontes_recurso, meio_pagamento, data_competencia, data_financeira,
                         tipo_lancamento, flg_lancamento, valor, origem_lancamento, historico,
                         num_documento, arquivo_comprovante, conciliado, data_inclusao,
                         data_alteracao, %s, %s, %s, %s, %s, %s
-                      FROM fin_lancamentos_contabeis WHERE %s",
+                      FROM fin_lancamentos WHERE %s",
                 $this->conex->qstr($motivo),
                 $this->conex->qstr(date('Y-m-d H:i:s')),
                 $this->conex->qstr(isset($_SESSION['_cod_usuario']) ? $_SESSION['_cod_usuario'] : ''),
@@ -566,7 +566,7 @@ class GerenciarContabilizacaoAC {
                 $onde);
             $this->conex->Execute($sql);
         } catch (Exception $e) {
-            // log indisponivel nao impede a contabilizacao
+            // log indisponivel nao impede a geracao de lancamentos
         }
     }
 
@@ -578,11 +578,11 @@ class GerenciarContabilizacaoAC {
 
     private function carregarPagamentos($somenteNaoLancados = false) {
         $filtro = $somenteNaoLancados
-            ? " AND NOT EXISTS (SELECT 1 FROM fin_lancamentos_contabeis l
+            ? " AND NOT EXISTS (SELECT 1 FROM fin_lancamentos l
                                  WHERE l.cod_evento = p.cod_evento
                                    AND l.cod_pagamento = p.cod_pagamento) "
             : '';
-        // periodo fechado: a contabilizacao nao cria/refaz lancamento la dentro
+        // periodo fechado: a geracao de lancamentos nao cria/refaz lancamento la dentro
         $fech = $this->dataFechamento();
         if ($fech) {
             $filtro .= sprintf(" AND DATE(p.data_pagamento) > %s ", $this->conex->qstr($fech));
@@ -696,7 +696,7 @@ class GerenciarContabilizacaoAC {
 
         // grava em blocos para nao estourar max_allowed_packet
         foreach (array_chunk($linhas, 200) as $bloco) {
-            $sql = "INSERT INTO fin_lancamentos_contabeis " . $colunas . " VALUES " . implode(",\n", $bloco);
+            $sql = "INSERT INTO fin_lancamentos " . $colunas . " VALUES " . implode(",\n", $bloco);
             $this->conex->debug = $debug;
             $this->conex->Execute($sql);
         }

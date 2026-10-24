@@ -4,7 +4,7 @@
  * Pagamentos da ficha do inscrito).
  *
  * O que faz: snapshot em tab_pagamentos_atualizados, status ESTORNADO e
- * contra-lancamento contabil (debito) — ver Pagamento::estornar().
+ * contra-lancamento financeiro (debito) — ver Pagamento::estornar().
  * A devolucao do dinheiro em si e feita FORA do sistema (gateway/banco).
  *
  * Restrito a SIS_CONTROLE_FINANCEIRO: estorno e ato do financeiro (o aviso

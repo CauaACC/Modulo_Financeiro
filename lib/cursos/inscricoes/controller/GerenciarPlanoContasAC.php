@@ -22,7 +22,7 @@ class GerenciarPlanoContasAC {
                   "message":      "' . $obj->getMessage() . '",
                   "codPlanoContas": "' . $obj->getCodPlanoContas() . '",
                   "codPlanoContasPai": "' . $obj->getCodPlanoContasPai() . '",
-                  "codigoContabil": "' . $obj->getCodigoContabil() . '",
+                  "codigoFinanceiro": "' . $obj->getCodigoFinanceiro() . '",
                   "naturezaSaldo": "' . $obj->getNaturezaSaldo() . '",
                   "tipoConta": "' . $obj->getTipoConta() . '",
                   "nomePlanoContas":"' . $obj->getNomePlanoContas() . '",
@@ -94,7 +94,7 @@ class GerenciarPlanoContasAC {
                     </td>
                     <td class="col-codigo">
                         <?php if ($ehSub) { ?><span class="tree-indent"></span><?php } ?>
-                        <?php echo $objL->getCodigoContabil(); ?>
+                        <?php echo $objL->getCodigoFinanceiro(); ?>
                     </td>
                     <td class="col-nome">
                         <?php if ($ehSub) { ?><span class="tree-connector">└</span><?php } ?>

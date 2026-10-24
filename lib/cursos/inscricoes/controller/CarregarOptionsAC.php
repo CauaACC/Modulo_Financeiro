@@ -1499,7 +1499,7 @@ class CarregarOptionsAC {
                     ?>
                     <option
                         <?php echo verifItemSelected($fws_['cod_plano_contas'], $objL->getCodPlanoContas()) ?>
-                        value='<?php echo $objL->getCodPlanoContas()?>' ><?php echo trim($objL->getCodigoContabil() . ' - ' . ($objL->getNomePlanoContas() ? $objL->getNomePlanoContas() : $objL->getDescricao()), ' -') ?></option>
+                        value='<?php echo $objL->getCodPlanoContas()?>' ><?php echo trim($objL->getCodigoFinanceiro() . ' - ' . ($objL->getNomePlanoContas() ? $objL->getNomePlanoContas() : $objL->getDescricao()), ' -') ?></option>
                     <?php
                 }
             }
@@ -1517,7 +1517,7 @@ class CarregarOptionsAC {
                     ?>
                     <option
                         <?php echo verifItemSelected($fws_['cod_plano_contas'], $objL->getCodPlanoContas()) ?>
-                        value='<?php echo $objL->getCodPlanoContas()?>' ><?php echo trim($objL->getCodigoContabil() . ' - ' . ($objL->getNomePlanoContas() ? $objL->getNomePlanoContas() : $objL->getDescricao()), ' -') ?></option>
+                        value='<?php echo $objL->getCodPlanoContas()?>' ><?php echo trim($objL->getCodigoFinanceiro() . ' - ' . ($objL->getNomePlanoContas() ? $objL->getNomePlanoContas() : $objL->getDescricao()), ' -') ?></option>
                     <?php
                 }
             }
@@ -1541,7 +1541,7 @@ class CarregarOptionsAC {
                         continue;
                     }
                     ?>
-                    <option value='<?php echo $objL->getCodPlanoContas()?>' ><?php echo trim($objL->getCodigoContabil() . ' - ' . ($objL->getNomePlanoContas() ? $objL->getNomePlanoContas() : $objL->getDescricao()), ' -') ?></option>
+                    <option value='<?php echo $objL->getCodPlanoContas()?>' ><?php echo trim($objL->getCodigoFinanceiro() . ' - ' . ($objL->getNomePlanoContas() ? $objL->getNomePlanoContas() : $objL->getDescricao()), ' -') ?></option>
                     <?php
                 }
             }
@@ -1559,7 +1559,7 @@ class CarregarOptionsAC {
                     ?>
                     <option
                         <?php echo verifItemSelected($fws_['cod_plano_contas'], $objL->getCodPlanoContas()) ?>
-                        value='<?php echo $objL->getCodPlanoContas()?>' data-tipo='<?php echo $objL->getTipoConta()?>' ><?php echo trim($objL->getCodigoContabil() . ' - ' . ($objL->getNomePlanoContas() ? $objL->getNomePlanoContas() : $objL->getDescricao()), ' -') ?></option>
+                        value='<?php echo $objL->getCodPlanoContas()?>' data-tipo='<?php echo $objL->getTipoConta()?>' ><?php echo trim($objL->getCodigoFinanceiro() . ' - ' . ($objL->getNomePlanoContas() ? $objL->getNomePlanoContas() : $objL->getDescricao()), ' -') ?></option>
                     <?php
                 }
             }
@@ -1578,7 +1578,7 @@ class CarregarOptionsAC {
                     <option
                         <?php echo verifItemSelected($fws_['cod_rateio'], $objL->getCodRateio()) ?>
                         value='<?php echo $objL->getCodRateio()?>'>
-                        <?php echo $objL->getCodigoContabilRateio() .' '. $objL->getNomeRateio() ?>
+                        <?php echo $objL->getCodigoFinanceiroRateio() .' '. $objL->getNomeRateio() ?>
                     </option>
                     <?php
                 }
@@ -1678,7 +1678,7 @@ class CarregarOptionsAC {
                     <option
                         <?php echo verifItemSelected($fws_['cod_centro_custo'], $objL->getCodCentroCusto()) ?>
                         value='<?php echo $objL->getCodCentroCusto()?>'>
-                        <?php echo $objL->getCodigoContabil() .' '. $objL->getDescricao() ?>
+                        <?php echo $objL->getCodigoFinanceiro() .' '. $objL->getDescricao() ?>
                     </option>
                     <?php
                 }

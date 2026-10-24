@@ -1,12 +1,12 @@
 <?php
 
-class LancamentosContabeis extends LancamentosContabeisVO {
+class Lancamentos extends LancamentosVO {
 
     private $objDAO;
 
     function __construct() {
         $this->codEvento = COD_EVENTO;
-        $this->objDAO = new LancamentosContabeisDAO();
+        $this->objDAO = new LancamentosDAO();
     }
     public function getEvento() {
         $obj = new Evento();
@@ -15,12 +15,12 @@ class LancamentosContabeis extends LancamentosContabeisVO {
         return $obj;
     }
 
-    public function LancamentosContabeisExiste() {
-        if (!$this->getCodLancamentosContabeis()) {
+    public function LancamentosExiste() {
+        if (!$this->getCodLancamentos()) {
             throw new Exception('Código do Centro de Custo inválido ou não informado.');
         }
         if (!$this->objDAO->getByIdExiste($this)) {
-            throw new Exception("Nenhum Centro de Custo foi encontrada para o código informado: " . $this->getCodLancamentosContabeis() . ".");
+            throw new Exception("Nenhum Centro de Custo foi encontrada para o código informado: " . $this->getCodLancamentos() . ".");
             //throw new Exception("Id informado para deleção não existe");
         }
     }
@@ -28,14 +28,14 @@ class LancamentosContabeis extends LancamentosContabeisVO {
     public function salvar($debug = false) {
         
         $this->validatorSalvar();
-        if (is_null($this->getCodLancamentosContabeis()) or $this->getCodLancamentosContabeis() == "") {
+        if (is_null($this->getCodLancamentos()) or $this->getCodLancamentos() == "") {
             if ($this->objDAO->insert($this, $debug)) {
                 throw new OKException("Centro de Custo salva com sucesso.");
             } else {
                 throw new Exception("Novo Centro de Custo não foi salva.");
             }
         } else {
-            $this->LancamentosContabeisExiste($debug);
+            $this->LancamentosExiste($debug);
 
             if ($this->objDAO->update($this, $debug)) {
                 throw new OKException("Centro de Custo foi atualizado com sucesso.");
@@ -47,16 +47,16 @@ class LancamentosContabeis extends LancamentosContabeisVO {
 
     public function excluir($debug = false) {
         if($this->validatorExcluir()){
-            $excluidoLancamentosContabeis          = $this->objDAO->delete($this, $debug);
-            if ($excluidoLancamentosContabeis) {
-                throw new OKException("Centro de Custo cód:" . $this->getCodLancamentosContabeis() . " foi excluída com sucesso.");
+            $excluidoLancamentos          = $this->objDAO->delete($this, $debug);
+            if ($excluidoLancamentos) {
+                throw new OKException("Centro de Custo cód:" . $this->getCodLancamentos() . " foi excluída com sucesso.");
             } else {
-                throw new Exception("Centro de Custo cód:" . $this->getCodLancamentosContabeis() . " não foi excluída.");
+                throw new Exception("Centro de Custo cód:" . $this->getCodLancamentos() . " não foi excluída.");
             }
         }
     }
 
-    public function getLancamentosContabeisById($debug = false) {
+    public function getLancamentosById($debug = false) {
         $this->objDAO->getById($this, $debug);
     }
 
@@ -73,9 +73,9 @@ class LancamentosContabeis extends LancamentosContabeisVO {
         return $this->objDAO->carregarListaFiltrada($this, $filtros, $debug);
     }
 
-    public function carregarListaLancamentosContabeis($condicoes=false, $debug = false) {
-        $this->objDAO->carregarListaLancamentosContabeisByIdEvento($this, $condicoes, $debug);
-        if ($this->getListaLancamentosContabeis()) {
+    public function carregarListaLancamentos($condicoes=false, $debug = false) {
+        $this->objDAO->carregarListaLancamentosByIdEvento($this, $condicoes, $debug);
+        if ($this->getListaLancamentos()) {
         } else {
             throw new Exception("Evento não possui Centro de Custo cadastrado.");
         }

@@ -178,7 +178,7 @@ $objSRV = new GerenciarPlanoContasAC();
                 $('#nomePlanoContas').val(data.nomePlanoContas);
                 $('#tipoConta').val(data.tipoConta);
                 $('#naturezaSaldo').val(data.naturezaSaldo);
-                $('#codigoContabil').val(data.codigoContabil);
+                $('#codigoFinanceiro').val(data.codigoFinanceiro);
                 $('#descricao').val(data.descricao);
                 $('#aceitaLancamento').val(data.aceitaLancamento);
                 var tipoPai = $('#codPlanoContasPai option:selected').data('tipo');
@@ -220,7 +220,7 @@ $objSRV = new GerenciarPlanoContasAC();
         $('#nomePlanoContas').val('');
         $('#tipoConta').val('').prop('disabled', false).prop('readonly', false).css('background', '');
         $('#naturezaSaldo').val('');
-        $('#codigoContabil').val('');
+        $('#codigoFinanceiro').val('');
         $('#descricao').val('');
         $('#aceitaLancamento').val(1);
         $('#getMessage').html('');
@@ -282,8 +282,8 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label for="codigoContabil">Código:</label>
-                                <input type="text" id="codigoContabil" name="codigoContabil" value="" class="form-control" placeholder="Ex.: 0106">
+                                <label for="codigoFinanceiro">Código:</label>
+                                <input type="text" id="codigoFinanceiro" name="codigoFinanceiro" value="" class="form-control" placeholder="Ex.: 0106">
                                 <small class="text-muted">Deixe em branco para gerar automaticamente.</small>
                             </div>
                         </div>

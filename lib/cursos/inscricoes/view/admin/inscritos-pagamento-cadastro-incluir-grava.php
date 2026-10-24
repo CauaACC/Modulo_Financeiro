@@ -93,7 +93,7 @@ If (!$Conexao_db = FWA_Conexao("OpcTec")) { //Conectando-se ao banco de dados
           $codPlanoContasReceita = $config->getCodPlanoContasReceita();
 
           if (!empty($codPlanoContasReceita) && !empty($codPagamentoInserido)) {
-              $lancamento = new LancamentosContabeis();
+              $lancamento = new Lancamentos();
               $lancamento->setCodEvento($cod_evento);
               $lancamento->setCodPagamento($codPagamentoInserido);
 

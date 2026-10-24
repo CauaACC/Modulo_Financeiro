@@ -216,7 +216,7 @@ $porPlano = $objSRV->carregarLancamentosPorPlanoContas($fws_);
                         if (p.tipo_conta == 'PATRIMONIO_LIQUIDO') dotP = 'dot-purple';
                         htmlPlano += '<tr data-conta="' + p.cod_plano_contas + '" style="cursor:pointer;"'
                                    + ' title="Ver o extrato desta conta no Razão">'
-                                   + '<td>' + p.codigo_contabil + '</td>';
+                                   + '<td>' + p.codigo_financeiro + '</td>';
                         htmlPlano += '<td class="col-nome">' + p.nome_plano_contas + '</td>';
                         htmlPlano += '<td><span class="badge-tipo"><span class="dot ' + dotP + '"></span>' + p.tipo_conta + '</span></td>';
                         htmlPlano += '<td style="text-align:center;">' + p.qtd + '</td>';
@@ -521,7 +521,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
                             <tr data-conta="<?php echo $p['cod_plano_contas']; ?>"
                                 style="cursor:pointer;"
                                 title="Ver o extrato desta conta no Razão">
-                                <td><?php echo $p['codigo_contabil']; ?></td>
+                                <td><?php echo $p['codigo_financeiro']; ?></td>
                                 <td class="col-nome"><?php echo $p['nome_plano_contas']; ?></td>
                                 <td><span class="badge-tipo"><span class="dot <?php echo $dotP; ?>"></span><?php echo $p['tipo_conta']; ?></span></td>
                                 <td style="text-align:center;"><?php echo $p['qtd']; ?></td>

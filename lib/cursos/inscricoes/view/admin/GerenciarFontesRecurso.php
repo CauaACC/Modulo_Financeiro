@@ -215,7 +215,7 @@ require_once(dirname(__FILE__)."/../../view/admin/area_admin_menu_financeiro.php
                         </select>
                     </div>
                     <!-- Saldo de abertura da conta: o que ela ja tinha antes da
-                         contabilizacao. Nao entra no resultado; alimenta o quadro
+                         geracao de lancamentos. Nao entra no resultado; alimenta o quadro
                          Posicao de caixa. -->
                     <div class="row">
                         <div class="col-sm-6">

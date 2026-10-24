@@ -24,7 +24,7 @@ class GerenciarRelatoriosFinanceirosAC {
                     COUNT(*) AS qtd_lancamentos,
                     COALESCE(SUM(CASE WHEN conciliado = 1 THEN 1 ELSE 0 END), 0) AS qtd_conciliados,
                     COALESCE(SUM(CASE WHEN conciliado = 0 OR conciliado IS NULL THEN 1 ELSE 0 END), 0) AS qtd_nao_conciliados
-                FROM fin_lancamentos_contabeis
+                FROM fin_lancamentos
                 WHERE cod_evento = '%s' %s
             ", $codEvento, $whereData);
 
@@ -68,7 +68,7 @@ class GerenciarRelatoriosFinanceirosAC {
                     flg_lancamento,
                     COUNT(*) AS qtd,
                     COALESCE(SUM(valor), 0) AS total_valor
-                FROM fin_lancamentos_contabeis
+                FROM fin_lancamentos
                 WHERE cod_evento = '%s' %s
                 GROUP BY tipo_lancamento, flg_lancamento
                 ORDER BY tipo_lancamento
@@ -98,22 +98,22 @@ class GerenciarRelatoriosFinanceirosAC {
             $sql = sprintf("
                 SELECT
                     fpc.cod_plano_contas,
-                    fpc.codigo_contabil,
+                    fpc.codigo_financeiro,
                     fpc.nome_plano_contas,
                     fpc.tipo_conta,
                     fpc.natureza_saldo,
-                    COUNT(flc.cod_lancamentos_contabeis) AS qtd,
+                    COUNT(flc.cod_lancamentos) AS qtd,
                     COALESCE(SUM(flc.valor), 0) AS total_valor
                 FROM fin_plano_contas fpc
-                LEFT JOIN fin_lancamentos_contabeis flc
+                LEFT JOIN fin_lancamentos flc
                     ON flc.cod_plano_contas = fpc.cod_plano_contas
                     AND flc.cod_evento = fpc.cod_evento
                     %s
                 WHERE fpc.cod_evento = '%s'
                     AND fpc.aceita_lancamento = 1
-                GROUP BY fpc.cod_plano_contas, fpc.codigo_contabil, fpc.nome_plano_contas, fpc.tipo_conta, fpc.natureza_saldo
+                GROUP BY fpc.cod_plano_contas, fpc.codigo_financeiro, fpc.nome_plano_contas, fpc.tipo_conta, fpc.natureza_saldo
                 HAVING qtd > 0
-                ORDER BY fpc.codigo_contabil
+                ORDER BY fpc.codigo_financeiro
             ", $this->montarWhereDataAlias($fws_, 'flc'), $codEvento);
 
             $this->conex->debug = $debug;
@@ -147,11 +147,11 @@ class GerenciarRelatoriosFinanceirosAC {
             }
 
             $sql = sprintf("
-                SELECT flc.*, fpc.nome_plano_contas, fpc.codigo_contabil
-                FROM fin_lancamentos_contabeis flc
+                SELECT flc.*, fpc.nome_plano_contas, fpc.codigo_financeiro
+                FROM fin_lancamentos flc
                 LEFT JOIN fin_plano_contas fpc ON fpc.cod_plano_contas = flc.cod_plano_contas AND fpc.cod_evento = flc.cod_evento
                 WHERE flc.cod_evento = '%s' %s %s %s
-                ORDER BY flc.data_competencia DESC, flc.cod_lancamentos_contabeis DESC
+                ORDER BY flc.data_competencia DESC, flc.cod_lancamentos DESC
             ", $codEvento, $whereData, $whereTipo, $whereConciliado);
 
             $this->conex->debug = $debug;
@@ -180,7 +180,7 @@ class GerenciarRelatoriosFinanceirosAC {
                         <td><span class="badge-tipo"><span class="dot <?php echo $dotTipo; ?>"></span><?php echo $tipo; ?></span></td>
                         <td><span class="badge-tipo"><span class="dot <?php echo $dotFlg; ?>"></span><?php echo $flgTxt; ?></span></td>
                         <td class="col-nome" style="text-align:right;">R$ <?php echo number_format($rows['valor'], 2, ',', '.'); ?></td>
-                        <td><?php echo $rows['codigo_contabil'] . ' - ' . $rows['nome_plano_contas']; ?></td>
+                        <td><?php echo $rows['codigo_financeiro'] . ' - ' . $rows['nome_plano_contas']; ?></td>
                         <td><?php echo $rows['origem_lancamento']; ?></td>
                         <td><?php echo $rows['historico']; ?></td>
                         <td><span class="badge-tipo"><span class="dot <?php echo $dotConc; ?>"></span><?php echo $concTxt; ?></span></td>
@@ -209,7 +209,7 @@ class GerenciarRelatoriosFinanceirosAC {
                 $ii++;
                 ?>
                 <tr>
-                    <td><?php echo $objL->getCodigoContabilRateio(); ?></td>
+                    <td><?php echo $objL->getCodigoFinanceiroRateio(); ?></td>
                     <td class="col-nome"><?php echo $objL->getNomeRateio(); ?></td>
                     <td style="text-align:right;"><?php echo $objL->getPercentual(); ?>%</td>
                     <td><?php echo $objL->getDescricao(); ?></td>
@@ -236,7 +236,7 @@ class GerenciarRelatoriosFinanceirosAC {
                 $ii++;
                 ?>
                 <tr>
-                    <td><?php echo $objL->getCodigoContabil(); ?></td>
+                    <td><?php echo $objL->getCodigoFinanceiro(); ?></td>
                     <td class="col-nome"><?php echo $objL->getNomeCentroCusto(); ?></td>
                     <td><?php echo $objL->getDescricao(); ?></td>
                 </tr>
@@ -294,7 +294,7 @@ class GerenciarRelatoriosFinanceirosAC {
                 if ($tipoConta == 'PATRIMONIO_LIQUIDO') $dotCor = 'dot-purple';
                 ?>
                 <tr>
-                    <td><?php echo $objL->getCodigoContabil(); ?></td>
+                    <td><?php echo $objL->getCodigoFinanceiro(); ?></td>
                     <td class="col-nome"><?php echo $objL->getNomePlanoContas(); ?></td>
                     <td><span class="badge-tipo"><span class="dot <?php echo $dotCor; ?>"></span><?php echo $tipoConta; ?></span></td>
                     <td><?php echo $objL->getNaturezaSaldo(); ?></td>
@@ -320,7 +320,7 @@ class GerenciarRelatoriosFinanceirosAC {
             $sql = sprintf("
                 SELECT
                     fpc.cod_plano_contas,
-                    fpc.codigo_contabil,
+                    fpc.codigo_financeiro,
                     fpc.nome_plano_contas,
                     fpc.tipo_conta,
                     fpc.natureza_saldo,
@@ -329,14 +329,14 @@ class GerenciarRelatoriosFinanceirosAC {
                     COALESCE(SUM(CASE WHEN flc.flg_lancamento = 'D' THEN flc.valor ELSE 0 END), 0) AS total_debito,
                     COALESCE(SUM(CASE WHEN flc.flg_lancamento = 'C' THEN flc.valor ELSE 0 END), 0) AS total_credito
                 FROM fin_plano_contas fpc
-                LEFT JOIN fin_lancamentos_contabeis flc
+                LEFT JOIN fin_lancamentos flc
                     ON flc.cod_plano_contas = fpc.cod_plano_contas
                     AND flc.cod_evento = fpc.cod_evento
                     %s
                 WHERE fpc.cod_evento = '%s'
-                GROUP BY fpc.cod_plano_contas, fpc.codigo_contabil, fpc.nome_plano_contas,
+                GROUP BY fpc.cod_plano_contas, fpc.codigo_financeiro, fpc.nome_plano_contas,
                          fpc.tipo_conta, fpc.natureza_saldo, fpc.cod_plano_contas_pai, fpc.aceita_lancamento
-                ORDER BY fpc.codigo_contabil
+                ORDER BY fpc.codigo_financeiro
             ", $whereData, $codEvento);
 
             $this->conex->debug = $debug;
@@ -377,7 +377,7 @@ class GerenciarRelatoriosFinanceirosAC {
     /**
      * Receita que veio de pagamento com inscricao CANCELADA/DEVOLVIDA no sistema.
      *
-     * Contabilmente e receita normal (o dinheiro entrou), por isso fica somada
+     * Financeiramente e receita normal (o dinheiro entrou), por isso fica somada
      * nas rubricas -- nao existe rubrica de "cancelamento". Mas para o
      * coordenador isso e RISCO: parte do saldo pode ser reclamada de volta.
      * Dai a ressalva no rodape, e nao uma linha no corpo do balancete.
@@ -388,7 +388,7 @@ class GerenciarRelatoriosFinanceirosAC {
             $sql = sprintf("
                 SELECT COUNT(DISTINCT flc.cod_pagamento) AS qtd,
                        COALESCE(SUM(flc.valor), 0) AS total
-                  FROM fin_lancamentos_contabeis flc
+                  FROM fin_lancamentos flc
                  INNER JOIN tab_pagamentos p ON p.cod_pagamento = flc.cod_pagamento
                                             AND p.cod_evento = flc.cod_evento
                  WHERE flc.cod_evento = '%s'
@@ -470,7 +470,7 @@ class GerenciarRelatoriosFinanceirosAC {
                     <?php } ?>>
                     <td>
                         <?php if (!$ehPai) { ?><span class="tree-indent"></span><?php } ?>
-                        <?php echo $c['codigo_contabil']; ?>
+                        <?php echo $c['codigo_financeiro']; ?>
                     </td>
                     <td class="col-nome">
                         <?php if (!$ehPai) { ?><span class="tree-connector">└</span><?php } ?>
@@ -580,11 +580,11 @@ class GerenciarRelatoriosFinanceirosAC {
                        flc.historico, flc.num_documento, flc.origem_lancamento, flc.conciliado,
                        cc.nome_centro_custo,
                        COALESCE(i.nome_inscrito, flc.favorecido) AS favorecido
-                  FROM fin_lancamentos_contabeis flc
+                  FROM fin_lancamentos flc
                   LEFT JOIN fin_centro_custo cc ON cc.cod_centro_custo = flc.cod_centro_custo
                   LEFT JOIN tab_inscritos i ON i.cod_inscrito = flc.cod_inscrito AND i.cod_evento = flc.cod_evento
                  WHERE flc.cod_evento = '%s' AND flc.cod_plano_contas = '%s' %s
-                 ORDER BY flc.data_competencia, flc.cod_lancamentos_contabeis
+                 ORDER BY flc.data_competencia, flc.cod_lancamentos
             ", $codEvento, $codConta, $whereData);
 
             $this->conex->debug = $debug;
@@ -725,7 +725,7 @@ class GerenciarRelatoriosFinanceirosAC {
                 $totalC += $c['total_credito'];
             }
 
-            $sh->setCellValue('A' . $l, $c['codigo_contabil']);
+            $sh->setCellValue('A' . $l, $c['codigo_financeiro']);
             $sh->setCellValue('C' . $l, ($ehGrupo ? '' : '    ') . $this->paraUtf8($c['nome_plano_contas']));
             if ($c['total_credito'] > 0) { $sh->setCellValue('E' . $l, floatval($c['total_credito'])); }
             if ($c['total_debito'] > 0)  { $sh->setCellValue('F' . $l, floatval($c['total_debito'])); }
@@ -872,7 +872,7 @@ class GerenciarRelatoriosFinanceirosAC {
             if (intval($p['qtd']) == 0) {
                 continue;   // conta sem movimento nao entra, igual ao balancete
             }
-            $sh->setCellValue('A' . $l, $p['codigo_contabil']);
+            $sh->setCellValue('A' . $l, $p['codigo_financeiro']);
             $sh->setCellValue('B' . $l, $this->paraUtf8($p['nome_plano_contas']));
             $sh->setCellValue('C' . $l, $p['tipo_conta']);
             $sh->setCellValue('D' . $l, intval($p['qtd']));
@@ -1038,11 +1038,11 @@ class GerenciarRelatoriosFinanceirosAC {
         $whereTipo = !empty($fws_['filtroTipo']) ? sprintf(" AND tipo_lancamento = '%s'", $fws_['filtroTipo']) : '';
         $whereConc = ($fws_['filtroConciliado'] !== '') ? sprintf(" AND conciliado = '%s'", $fws_['filtroConciliado']) : '';
         $sql = sprintf("
-            SELECT flc.*, fpc.nome_plano_contas, fpc.codigo_contabil
-              FROM fin_lancamentos_contabeis flc
+            SELECT flc.*, fpc.nome_plano_contas, fpc.codigo_financeiro
+              FROM fin_lancamentos flc
               LEFT JOIN fin_plano_contas fpc ON fpc.cod_plano_contas = flc.cod_plano_contas AND fpc.cod_evento = flc.cod_evento
              WHERE flc.cod_evento = '%s' %s %s %s
-             ORDER BY flc.data_competencia DESC, flc.cod_lancamentos_contabeis DESC
+             ORDER BY flc.data_competencia DESC, flc.cod_lancamentos DESC
         ", COD_EVENTO, $whereData, $whereTipo, $whereConc);
         $this->conex->debug = $debug;
         $rs = $this->conex->Execute($sql);
@@ -1055,7 +1055,7 @@ class GerenciarRelatoriosFinanceirosAC {
                     $r['tipo_lancamento'],
                     $r['flg_lancamento'] == 'C' ? 'CREDITO' : 'DEBITO',
                     floatval($r['valor']),
-                    trim($r['codigo_contabil'] . ' - ' . $r['nome_plano_contas'], ' -'),
+                    trim($r['codigo_financeiro'] . ' - ' . $r['nome_plano_contas'], ' -'),
                     $r['origem_lancamento'],
                     $r['historico'],
                     $r['conciliado'] == 1 ? 'SIM' : 'NAO',
@@ -1078,10 +1078,10 @@ class GerenciarRelatoriosFinanceirosAC {
         $sql = sprintf("
             SELECT flc.data_competencia, flc.flg_lancamento, flc.valor, flc.historico, flc.num_documento,
                    COALESCE(i.nome_inscrito, flc.favorecido) AS favorecido
-              FROM fin_lancamentos_contabeis flc
+              FROM fin_lancamentos flc
               LEFT JOIN tab_inscritos i ON i.cod_inscrito = flc.cod_inscrito AND i.cod_evento = flc.cod_evento
              WHERE flc.cod_evento = '%s' AND flc.cod_plano_contas = '%s' %s
-             ORDER BY flc.data_competencia, flc.cod_lancamentos_contabeis
+             ORDER BY flc.data_competencia, flc.cod_lancamentos
         ", COD_EVENTO, $codConta, $whereData);
         $this->conex->debug = $debug;
         $rs = $this->conex->Execute($sql);
@@ -1116,7 +1116,7 @@ class GerenciarRelatoriosFinanceirosAC {
                    COALESCE(SUM(CASE WHEN flc.flg_lancamento = 'C' THEN flc.valor ELSE 0 END), 0) AS entradas,
                    COALESCE(SUM(CASE WHEN flc.flg_lancamento = 'D' THEN flc.valor ELSE 0 END), 0) AS saidas
               FROM fin_fontes_recurso fr
-              LEFT JOIN fin_lancamentos_contabeis flc
+              LEFT JOIN fin_lancamentos flc
                      ON flc.cod_fontes_recurso = fr.cod_fontes_recurso AND flc.cod_evento = fr.cod_evento %s
              WHERE fr.cod_evento = '%s' AND fr.status = 'ATIVADA'
              GROUP BY fr.cod_fontes_recurso, fr.nome_fontes_recurso, fr.saldo_inicial, fr.data_saldo_inicial
@@ -1158,7 +1158,7 @@ class GerenciarRelatoriosFinanceirosAC {
         $linhas = array();
         if (!empty($dados)) {
             foreach ($dados as $p) {
-                $linhas[] = array($p['codigo_contabil'], $p['nome_plano_contas'], $p['tipo_conta'], intval($p['qtd']), floatval($p['total_valor']));
+                $linhas[] = array($p['codigo_financeiro'], $p['nome_plano_contas'], $p['tipo_conta'], intval($p['qtd']), floatval($p['total_valor']));
             }
         }
         return array('titulo' => 'Lancamentos por Plano de Contas', 'colunas' => array('Codigo', 'Conta', 'Tipo', 'Quantidade', 'Valor Total'), 'numCols' => array(4), 'linhas' => $linhas);
@@ -1170,7 +1170,7 @@ class GerenciarRelatoriosFinanceirosAC {
             $obj = new PlanoContas();
             $obj->carregarListaPlanoContas(false, $debug);
             foreach ((array) $obj->getListaPlanoContas() as $o) {
-                $linhas[] = array($o->getCodigoContabil(), $o->getNomePlanoContas(), $o->getTipoConta(), $o->getNaturezaSaldo(), $o->getAceitaLancamento() == 1 ? 'SIM' : 'NAO');
+                $linhas[] = array($o->getCodigoFinanceiro(), $o->getNomePlanoContas(), $o->getTipoConta(), $o->getNaturezaSaldo(), $o->getAceitaLancamento() == 1 ? 'SIM' : 'NAO');
             }
         } catch (Exception $e) {}
         return array('colunas' => array('Codigo', 'Nome', 'Tipo', 'Natureza Saldo', 'Aceita Lancamento'), 'linhas' => $linhas);
@@ -1182,7 +1182,7 @@ class GerenciarRelatoriosFinanceirosAC {
             $obj = new Rateios();
             $obj->carregarListaRateios(false, $debug);
             foreach ((array) $obj->getListaRateios() as $o) {
-                $linhas[] = array($o->getCodigoContabilRateio(), $o->getNomeRateio(), floatval($o->getPercentual()), $o->getDescricao());
+                $linhas[] = array($o->getCodigoFinanceiroRateio(), $o->getNomeRateio(), floatval($o->getPercentual()), $o->getDescricao());
             }
         } catch (Exception $e) {}
         return array('colunas' => array('Codigo', 'Nome', 'Percentual (%)', 'Descricao'), 'numCols' => array(2), 'linhas' => $linhas);
@@ -1194,7 +1194,7 @@ class GerenciarRelatoriosFinanceirosAC {
             $obj = new CentroCusto();
             $obj->carregarListaCentroCusto(false, $debug);
             foreach ((array) $obj->getListaCentroCusto() as $o) {
-                $linhas[] = array($o->getCodigoContabil(), $o->getNomeCentroCusto(), $o->getDescricao());
+                $linhas[] = array($o->getCodigoFinanceiro(), $o->getNomeCentroCusto(), $o->getDescricao());
             }
         } catch (Exception $e) {}
         return array('colunas' => array('Codigo', 'Nome', 'Descricao'), 'linhas' => $linhas);
@@ -1221,10 +1221,10 @@ class GerenciarRelatoriosFinanceirosAC {
             SELECT flc.cod_plano_contas, flc.data_competencia, flc.flg_lancamento, flc.valor,
                    flc.historico, flc.num_documento,
                    COALESCE(i.nome_inscrito, flc.favorecido, '') AS favorecido
-              FROM fin_lancamentos_contabeis flc
+              FROM fin_lancamentos flc
               LEFT JOIN tab_inscritos i ON i.cod_inscrito = flc.cod_inscrito AND i.cod_evento = flc.cod_evento
              WHERE flc.cod_evento = '%s' %s
-             ORDER BY flc.cod_plano_contas, flc.data_competencia, flc.cod_lancamentos_contabeis
+             ORDER BY flc.cod_plano_contas, flc.data_competencia, flc.cod_lancamentos
         ", COD_EVENTO, $whereData);
 
         $this->conex->debug = $debug;
@@ -1245,7 +1245,7 @@ class GerenciarRelatoriosFinanceirosAC {
         $evento = ($rs && !$rs->EOF) ? $this->paraUtf8($rs->fields['evento']) : ('Evento ' . COD_EVENTO);
         $gestor = ($rs && !$rs->EOF) ? $this->paraUtf8($rs->fields['gestor']) : '';
 
-        $sql = sprintf("SELECT nome_centro_custo, codigo_contabil FROM fin_centro_custo
+        $sql = sprintf("SELECT nome_centro_custo, codigo_financeiro FROM fin_centro_custo
                          WHERE cod_evento = '%s' AND status = 'ATIVADA'
                          ORDER BY cod_centro_custo LIMIT 1", COD_EVENTO);
         $rs = $this->conex->Execute($sql);
@@ -1253,7 +1253,7 @@ class GerenciarRelatoriosFinanceirosAC {
             'evento'        => $evento,
             'gestor'        => $gestor,
             'centro'        => ($rs && !$rs->EOF) ? $this->paraUtf8($rs->fields['nome_centro_custo']) : '',
-            'centro_codigo' => ($rs && !$rs->EOF) ? $rs->fields['codigo_contabil'] : '',
+            'centro_codigo' => ($rs && !$rs->EOF) ? $rs->fields['codigo_financeiro'] : '',
         );
     }
 
@@ -1282,7 +1282,7 @@ class GerenciarRelatoriosFinanceirosAC {
                        COALESCE(SUM(CASE WHEN flc.flg_lancamento = 'C' THEN flc.valor ELSE 0 END), 0) AS entradas,
                        COALESCE(SUM(CASE WHEN flc.flg_lancamento = 'D' THEN flc.valor ELSE 0 END), 0) AS saidas
                   FROM fin_fontes_recurso fr
-                  LEFT JOIN fin_lancamentos_contabeis flc
+                  LEFT JOIN fin_lancamentos flc
                          ON flc.cod_fontes_recurso = fr.cod_fontes_recurso
                         AND flc.cod_evento = fr.cod_evento %s
                  WHERE fr.cod_evento = '%s' AND fr.status = 'ATIVADA'
@@ -1315,7 +1315,7 @@ class GerenciarRelatoriosFinanceirosAC {
                 }
             }
             if ($ii == 0) {
-                echo "<tr><td colspan='6' style='padding:14px; color:#888;'>Nenhuma fonte de recurso cadastrada. Cadastre em Financeiro &gt; Contabilidade &gt; Fontes de Recurso.</td></tr>";
+                echo "<tr><td colspan='6' style='padding:14px; color:#888;'>Nenhuma fonte de recurso cadastrada. Cadastre em Financeiro &gt; Financeiro &gt; Fontes de Recurso.</td></tr>";
             }
             $tAtual = $tSaldoIni + $tEnt - $tSai;
             ?>

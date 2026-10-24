@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Configuracao inicial da contabilidade de um evento: popula plano de contas,
+ * Configuracao inicial da financeiro de um evento: popula plano de contas,
  * rateios, centro de custo e fontes de recurso sem cadastro item a item.
  *
  * Duas origens:
@@ -12,9 +12,9 @@
  *      nenhum evento anterior para copiar.
  *
  * Nada e sobrescrito: o que ja existe no evento e preservado e a copia so
- * acrescenta o que falta (comparando pelo codigo contabil / nome).
+ * acrescenta o que falta (comparando pelo codigo financeiro / nome).
  */
-class GerenciarCatalogoContabilAC {
+class GerenciarCatalogoAC {
 
     /**
      * Catalogo base (estrutura dos balancetes da fundacao). Serve so como
@@ -134,13 +134,13 @@ class GerenciarCatalogoContabilAC {
     /** O que existe no evento de origem, item a item. */
     private function detalharEvento($origem) {
         $contas = array();
-        $sql = sprintf("SELECT codigo_contabil, nome_plano_contas, tipo_conta, aceita_lancamento
+        $sql = sprintf("SELECT codigo_financeiro, nome_plano_contas, tipo_conta, aceita_lancamento
                         FROM fin_plano_contas WHERE cod_evento = %d AND status = 'ATIVADA'
-                        ORDER BY codigo_contabil", $origem);
+                        ORDER BY codigo_financeiro", $origem);
         $rs = $this->conex->Execute($sql);
         if ($rs) {
             foreach ($rs as $r) {
-                $contas[] = trim($r['codigo_contabil'] . ' ' . $this->paraUtf8($r['nome_plano_contas']))
+                $contas[] = trim($r['codigo_financeiro'] . ' ' . $this->paraUtf8($r['nome_plano_contas']))
                           . ($r['aceita_lancamento'] ? '' : ' (grupo)');
             }
         }
@@ -266,18 +266,18 @@ class GerenciarCatalogoContabilAC {
 
         // 1) plano de contas -- pais primeiro, depois amarra a hierarquia
         if (!empty($blocos['contas'])) {
-            $sql = sprintf("SELECT cod_plano_contas, cod_plano_contas_pai, nome_plano_contas, codigo_contabil,
+            $sql = sprintf("SELECT cod_plano_contas, cod_plano_contas_pai, nome_plano_contas, codigo_financeiro,
                                    descricao, tipo_conta, natureza_saldo, aceita_lancamento
                             FROM fin_plano_contas
                             WHERE cod_evento = %d AND status = 'ATIVADA'
-                            ORDER BY (cod_plano_contas_pai IS NOT NULL), codigo_contabil", $origem);
+                            ORDER BY (cod_plano_contas_pai IS NOT NULL), codigo_financeiro", $origem);
             $rs = $this->conex->Execute($sql);
-            $deParaAntigo = array();   // cod antigo -> codigo_contabil
-            $novos = array();          // codigo_contabil -> cod novo
+            $deParaAntigo = array();   // cod antigo -> codigo_financeiro
+            $novos = array();          // codigo_financeiro -> cod novo
 
             if ($rs) {
                 foreach ($rs as $r) {
-                    $codigo = trim($r['codigo_contabil']);
+                    $codigo = trim($r['codigo_financeiro']);
                     $deParaAntigo[$r['cod_plano_contas']] = $codigo;
 
                     if ($codigo !== '' && isset($mapaContas[$codigo])) {
@@ -300,7 +300,7 @@ class GerenciarCatalogoContabilAC {
         }
 
         // 2) centro de custo -- criado com o NOME DESTE evento (decisao do
-        //    usuario); o codigo contabil fica em branco pra informar o numero
+        //    usuario); o codigo financeiro fica em branco pra informar o numero
         //    do projeto depois
         if (!empty($blocos['centro']) && !$codCentro) {
             $codCentro = $this->criarCentroDoEvento($debug);
@@ -327,7 +327,7 @@ class GerenciarCatalogoContabilAC {
         if (!empty($blocos['rateios'])) {
             $mapaContas = $this->mapaContasExistentes($this->codEvento);
             $sql = sprintf("SELECT r.nome_rateio, r.descricao, r.percentual, r.valor_fixo, r.meio_pagamento,
-                                   o.codigo_contabil AS cod_origem, d.codigo_contabil AS cod_destino
+                                   o.codigo_financeiro AS cod_origem, d.codigo_financeiro AS cod_destino
                             FROM fin_rateios r
                             LEFT JOIN fin_plano_contas o ON o.cod_plano_contas = r.cod_conta_origem
                             LEFT JOIN fin_plano_contas d ON d.cod_plano_contas = r.cod_conta_destino
@@ -349,10 +349,10 @@ class GerenciarCatalogoContabilAC {
 
     /**
      * Depois de inserir todas as contas, liga cada filho ao pai correspondente
-     * (a origem referencia por ID; aqui a ponte e o codigo contabil).
+     * (a origem referencia por ID; aqui a ponte e o codigo financeiro).
      */
     private function amarrarHierarquia($origem, $deParaAntigo, $novos, $debug) {
-        $sql = sprintf("SELECT cod_plano_contas, cod_plano_contas_pai, codigo_contabil
+        $sql = sprintf("SELECT cod_plano_contas, cod_plano_contas_pai, codigo_financeiro
                         FROM fin_plano_contas
                         WHERE cod_evento = %d AND status = 'ATIVADA' AND cod_plano_contas_pai IS NOT NULL", $origem);
         $rs = $this->conex->Execute($sql);
@@ -360,7 +360,7 @@ class GerenciarCatalogoContabilAC {
             return;
         }
         foreach ($rs as $r) {
-            $codigoFilho = trim($r['codigo_contabil']);
+            $codigoFilho = trim($r['codigo_financeiro']);
             $codigoPai = isset($deParaAntigo[$r['cod_plano_contas_pai']]) ? $deParaAntigo[$r['cod_plano_contas_pai']] : '';
             if ($codigoFilho === '' || $codigoPai === '' || !isset($novos[$codigoFilho]) || !isset($novos[$codigoPai])) {
                 continue;
@@ -399,7 +399,7 @@ class GerenciarCatalogoContabilAC {
                 $novoId = $this->inserirConta(array(
                     'cod_plano_contas_pai' => $pai,
                     'nome_plano_contas'    => $nome,
-                    'codigo_contabil'      => $codigo,
+                    'codigo_financeiro'      => $codigo,
                     'descricao'            => '',
                     'tipo_conta'           => $tipo,
                     'natureza_saldo'       => $natureza,
@@ -489,11 +489,11 @@ class GerenciarCatalogoContabilAC {
     // ------------------------------------------------------------- gravadores
 
     private function inserirConta($r, $debug, $paiForcado = null) {
-        $codigo = isset($r['codigo_contabil']) ? trim($r['codigo_contabil']) : '';
+        $codigo = isset($r['codigo_financeiro']) ? trim($r['codigo_financeiro']) : '';
         $pai = $paiForcado !== null ? $paiForcado : null;
 
         $sql = sprintf("INSERT INTO fin_plano_contas
-            (cod_plano_contas_pai, cod_evento, cod_gestor, nome_plano_contas, codigo_contabil,
+            (cod_plano_contas_pai, cod_evento, cod_gestor, nome_plano_contas, codigo_financeiro,
              descricao, tipo_conta, natureza_saldo, aceita_lancamento, status, data_inclusao, id_inclusao)
             VALUES (%s, %d, %s, %s, %s, %s, %s, %s, %d, 'ATIVADA', %s, %s)",
             $pai ? intval($pai) : 'NULL',
@@ -545,7 +545,7 @@ class GerenciarCatalogoContabilAC {
             (nome_centro_custo, descricao, status, cod_evento, cod_gestor, data_inclusao, id_inclusao)
             VALUES (%s, %s, 'ATIVADA', %d, %s, %s, %s)",
             $this->conex->qstr($nome),
-            $this->conex->qstr('Centro de custo do projeto. Informe o codigo contabil do projeto na fundacao.'),
+            $this->conex->qstr('Centro de custo do projeto. Informe o codigo financeiro do projeto na fundacao.'),
             $this->codEvento,
             $this->codGestor ? intval($this->codGestor) : 'NULL',
             $this->conex->qstr(date('Y-m-d H:i:s')),
@@ -602,12 +602,12 @@ class GerenciarCatalogoContabilAC {
             }
         }
         $sql = sprintf("INSERT INTO fin_rateios
-            (cod_rateio_principal, codigo_contabil_rateio,
+            (cod_rateio_principal, codigo_financeiro_rateio,
              cod_conta_origem, cod_conta_destino, cod_centro_custo, percentual, valor_fixo, meio_pagamento,
              nome_rateio, descricao, status, cod_evento, cod_gestor, data_inclusao, id_inclusao)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'ATIVADA', %d, %s, %s, %s)",
             $codRateioPai ? intval($codRateioPai) : 'NULL',
-            $this->conex->qstr($this->proximoCodigoContabilRateio($codRateioPai)),
+            $this->conex->qstr($this->proximoCodigoFinanceiroRateio($codRateioPai)),
             $contaOrigem  ? intval($contaOrigem)  : 'NULL',
             $contaDestino ? intval($contaDestino) : 'NULL',
             $codCentro    ? intval($codCentro)    : 'NULL',
@@ -626,21 +626,21 @@ class GerenciarCatalogoContabilAC {
     }
 
     /**
-     * Mesmo formato do RateiosDAO::gerarCodigoContabilRateio: raiz e sequencial
+     * Mesmo formato do RateiosDAO::gerarCodigoFinanceiroRateio: raiz e sequencial
      * dentro do evento (1, 2, 3...) e filho e "codigo do pai"."N".
      */
-    private function proximoCodigoContabilRateio($codRateioPai) {
+    private function proximoCodigoFinanceiroRateio($codRateioPai) {
         if (!$codRateioPai) {
-            $sql = sprintf("SELECT MAX(CAST(codigo_contabil_rateio AS UNSIGNED)) FROM fin_rateios
+            $sql = sprintf("SELECT MAX(CAST(codigo_financeiro_rateio AS UNSIGNED)) FROM fin_rateios
                             WHERE cod_evento = %d AND (cod_rateio_principal IS NULL OR cod_rateio_principal = '')",
                            $this->codEvento);
             $ultimo = $this->conex->GetOne($sql);
             return (string)(intval($ultimo) + 1);
         }
-        $sql = sprintf("SELECT codigo_contabil_rateio FROM fin_rateios
+        $sql = sprintf("SELECT codigo_financeiro_rateio FROM fin_rateios
                         WHERE cod_rateio = %d AND cod_evento = %d", intval($codRateioPai), $this->codEvento);
         $codigoPai = $this->conex->GetOne($sql);
-        $sql = sprintf("SELECT MAX(CAST(SUBSTRING_INDEX(codigo_contabil_rateio, '.', -1) AS UNSIGNED))
+        $sql = sprintf("SELECT MAX(CAST(SUBSTRING_INDEX(codigo_financeiro_rateio, '.', -1) AS UNSIGNED))
                         FROM fin_rateios WHERE cod_rateio_principal = %d AND cod_evento = %d",
                        intval($codRateioPai), $this->codEvento);
         $ultimoNivel = $this->conex->GetOne($sql);
@@ -719,20 +719,20 @@ class GerenciarCatalogoContabilAC {
     }
 
     private function mapaContasExistentes($codEvento) {
-        $sql = sprintf("SELECT codigo_contabil, cod_plano_contas FROM fin_plano_contas
-                        WHERE cod_evento = %d AND status = 'ATIVADA' AND codigo_contabil IS NOT NULL", $codEvento);
+        $sql = sprintf("SELECT codigo_financeiro, cod_plano_contas FROM fin_plano_contas
+                        WHERE cod_evento = %d AND status = 'ATIVADA' AND codigo_financeiro IS NOT NULL", $codEvento);
         $rs = $this->conex->Execute($sql);
         $mapa = array();
         if ($rs) {
             foreach ($rs as $r) {
-                $mapa[trim($r['codigo_contabil'])] = $r['cod_plano_contas'];
+                $mapa[trim($r['codigo_financeiro'])] = $r['cod_plano_contas'];
             }
         }
         return $mapa;
     }
 
-    private function traduzirConta($codigoContabil, $mapa) {
-        $codigo = trim($codigoContabil);
+    private function traduzirConta($codigoFinanceiro, $mapa) {
+        $codigo = trim($codigoFinanceiro);
         return ($codigo !== '' && isset($mapa[$codigo])) ? $mapa[$codigo] : null;
     }
 

@@ -34,7 +34,7 @@ class GerenciarCentroCustoAC {
                   "codCentroCusto": "' . $obj->getCodCentroCusto() . '",
                   "codCentroCustoPai": "' . $obj->getCodCentroCustoPai() . '",
                   "nomeCentroCusto":"' . tratarJson($obj->getNomeCentroCusto()) . '",
-                  "codigoContabil":"' . tratarJson($obj->getCodigoContabil()) . '",
+                  "codigoFinanceiro":"' . tratarJson($obj->getCodigoFinanceiro()) . '",
                   "descricao":"' . tratarJson($obj->getDescricao()) . '",
                   "status":"' . $obj->getStatus() . '"
                  }';
@@ -101,7 +101,7 @@ class GerenciarCentroCustoAC {
                 $ii++;
                 $ehFilho = ($objL->getCodCentroCustoPai() != null && $objL->getCodCentroCustoPai() != '');
                 $classeHierarquia = $ehFilho ? 'centro-filho' : 'centro-pai';
-                $codigo = $objL->getCodigoContabil();
+                $codigo = $objL->getCodigoFinanceiro();
                 $nivel = $codigo ? substr_count($codigo, '.') : 0;
                 ?>
                 <tr id="<?php echo  $objL->getCodCentroCusto() ?>" data-cod-centro-custo-pai="<?php echo $objL->getCodCentroCustoPai() ?>" class="<?php echo $classeHierarquia ?>">

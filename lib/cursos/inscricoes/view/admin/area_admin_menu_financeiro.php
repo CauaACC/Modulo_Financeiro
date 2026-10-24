@@ -8,9 +8,9 @@ $_abaFinContab = (strpos($pg, 'GerenciarLancamentos') !== false
     || strpos($pg, 'GerenciarRelatoriosFinanceiros') !== false);
 
 // Configuracao: o que se ajusta UMA vez e quase nao se volta. Estava
-// espalhado — a inicial da contabilidade no meio da operacao contabil, o
+// espalhado — a inicial do financeiro no meio da operacao financeira, o
 // emissor no meio das notas —, competindo com o que se usa todo dia.
-$_abaFinConfig = (strpos($pg, 'ConfigurarContabilidade') !== false
+$_abaFinConfig = (strpos($pg, 'CatalogoFinanceiro') !== false
     || strpos($pg, 'GerenciarNotaFiscalEmissor') !== false);
 
 $_abaFinInteg = (strpos($pg, 'GerenciarPagamentoUpload') !== false
@@ -71,7 +71,7 @@ $_nfEmissorLiberado = (bool) @FWA_Autenticacao($_SESSION['_cod_usuario'], enumSi
 
               <div id="tabFinContabilidade" class="tab-pane <?= $_abaFinContab ? 'active' : '' ?>">
                      <a class="submenu-btn <?= strpos($pg, 'GerenciarRelatoriosFinanceiros') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/GerenciarRelatoriosFinanceiros.php"><i class="fa fa-bar-chart"></i> Relat&oacute;rios</a>
-                     <a class="submenu-btn <?= strpos($pg, 'GerenciarLancamentos') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/GerenciarLancamentosContabeis.php">Lan&ccedil;amentos</a>
+                     <a class="submenu-btn <?= strpos($pg, 'GerenciarLancamentos') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/GerenciarLancamentos.php">Lan&ccedil;amentos</a>
                      <a class="submenu-btn <?= strpos($pg, 'GerenciarPlanoContas') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/GerenciarPlanoContas.php">Plano de Contas</a>
                      <a class="submenu-btn <?= strpos($pg, 'GerenciarRateios') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/GerenciarRateios.php">Rateios</a>
                      <a class="submenu-btn <?= strpos($pg, 'GerenciarCentroCusto') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/GerenciarCentroCusto.php">Centro de Custo</a>
@@ -83,7 +83,7 @@ $_nfEmissorLiberado = (bool) @FWA_Autenticacao($_SESSION['_cod_usuario'], enumSi
               </div>
 
               <div id="tabFinConfig" class="tab-pane <?= $_abaFinConfig ? 'active' : '' ?>">
-                     <a class="submenu-btn <?= strpos($pg, 'ConfigurarContabilidade') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/ConfigurarContabilidade.php">Contabilidade</a>
+                     <a class="submenu-btn <?= strpos($pg, 'CatalogoFinanceiro') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/CatalogoFinanceiro.php">Cat&aacute;logo Financeiro</a>
                      <?php if ($_nfEmissorLiberado) { ?>
                      <a class="submenu-btn <?= strpos($pg, 'GerenciarNotaFiscalEmissor') !== false ? 'submenu-btn-ativo' : '' ?>" href="index.php?content=view/admin/GerenciarNotaFiscalEmissor.php">Emissores de NF</a>
                      <?php } ?>

@@ -1,6 +1,6 @@
 <?php
 
-class GerenciarLancamentosContabeisAC {
+class GerenciarLancamentosAC {
 
     private $conex;
 
@@ -90,15 +90,15 @@ class GerenciarLancamentosContabeisAC {
         exit();
     }
 
-    public function carregarLancamentosContabeis($fws_, $debug = false) {
-        $obj = new LancamentosContabeis();
-        $obj->setcodLancamentosContabeis($fws_['codLancamentosContabeis']);
-        $obj->getLancamentosContabeisById($debug);
+    public function carregarLancamentos($fws_, $debug = false) {
+        $obj = new Lancamentos();
+        $obj->setcodLancamentos($fws_['codLancamentos']);
+        $obj->getLancamentosById($debug);
         return $obj;
     }
 
-    public function editarLancamentosContabeis($fws_, $debug = false) {
-        $obj = $this->carregarLancamentosContabeis($fws_,$debug);
+    public function editarLancamentos($fws_, $debug = false) {
+        $obj = $this->carregarLancamentos($fws_,$debug);
 
         // Centro de custo, fonte, favorecido e documento faltavam no retorno: a
         // edicao reabria com esses campos em branco e, ao salvar, os apagava.
@@ -117,7 +117,7 @@ class GerenciarLancamentosContabeisAC {
             'message'                 => $u($obj->getMessage()),
             'codPlanoContas'          => $obj->getCodPlanoContas(),
             'flgLancamento'           => $obj->getFlgLancamento(),
-            'codLancamentosContabeis' => $obj->getCodLancamentosContabeis(),
+            'codLancamentos' => $obj->getCodLancamentos(),
             'historico'               => $u($obj->getHistorico()),
             'origemLancamento'        => $obj->getOrigemLancamento(),
             'valor'                   => $obj->getValor(),
@@ -135,13 +135,13 @@ class GerenciarLancamentosContabeisAC {
         exit();
     }
 
-    public function salvarLancamentosContabeis($fws_, $debug = false) {
+    public function salvarLancamentos($fws_, $debug = false) {
         try {
-            // if ($fws_['novocodLancamentosContabeis'] == 0) {
-            //     $fws_['codLancamentosContabeis'] = NULL;
+            // if ($fws_['novocodLancamentos'] == 0) {
+            //     $fws_['codLancamentos'] = NULL;
             // }
             $isForm = true;
-            $obj = $this->carregarLancamentosContabeis($fws_);
+            $obj = $this->carregarLancamentos($fws_);
 
             // Periodo fechado: nao aceita lancamento com data ATE o fechamento.
             // Vale para a data nova (do form) e para a data atual do lancamento
@@ -170,7 +170,7 @@ class GerenciarLancamentosContabeisAC {
         echo '{
         "statusMessage":"' . $ok . '",
         "message":      "' . tratarJson($e->getMessage()) . '",
-        "codLancamentosContabeis":"' . $obj->getCodLancamentosContabeis() . '"
+        "codLancamentos":"' . $obj->getCodLancamentos() . '"
         }';
     }
 
@@ -192,7 +192,7 @@ class GerenciarLancamentosContabeisAC {
             mkdir($pasta, 0755, true);
         }
         // nome estavel por lancamento; ao reenviar, sobrescreve o anterior
-        $codLanc = $obj->getCodLancamentosContabeis() ? $obj->getCodLancamentosContabeis() : ('novo' . time());
+        $codLanc = $obj->getCodLancamentos() ? $obj->getCodLancamentos() : ('novo' . time());
         $nome = 'comprovante_' . COD_EVENTO . '_' . $codLanc . '.' . $ext;
         $destino = $pasta . DIRECTORY_SEPARATOR . $nome;
 
@@ -209,12 +209,12 @@ class GerenciarLancamentosContabeisAC {
     public function baixarComprovante($fws_, $debug = false) {
         // o link e GET (abre em nova aba); nesse caso os parametros vem em $_GET,
         // nao em $fws_ (que o Command so preenche com c/m).
-        $cod = isset($fws_['codLancamentosContabeis']) && $fws_['codLancamentosContabeis'] !== ''
-             ? $fws_['codLancamentosContabeis']
-             : (isset($_GET['codLancamentosContabeis']) ? $_GET['codLancamentosContabeis'] : 0);
-        $obj = new LancamentosContabeis();
-        $obj->setcodLancamentosContabeis(intval($cod));
-        $obj->getLancamentosContabeisById($debug);
+        $cod = isset($fws_['codLancamentos']) && $fws_['codLancamentos'] !== ''
+             ? $fws_['codLancamentos']
+             : (isset($_GET['codLancamentos']) ? $_GET['codLancamentos'] : 0);
+        $obj = new Lancamentos();
+        $obj->setcodLancamentos(intval($cod));
+        $obj->getLancamentosById($debug);
         $nome = $obj->getArquivoComprovante();
         if (!$nome) {
             exit('Sem comprovante.');
@@ -236,11 +236,11 @@ class GerenciarLancamentosContabeisAC {
         exit();
     }
 
-    public function excluirLancamentosContabeis($fws_, $debug = false) {
+    public function excluirLancamentos($fws_, $debug = false) {
         try {
-            $obj = new LancamentosContabeis();
-            $obj->setcodLancamentosContabeis($fws_['codLancamentosContabeis']);
-            $obj->getLancamentosContabeisById($debug);
+            $obj = new Lancamentos();
+            $obj->setcodLancamentos($fws_['codLancamentos']);
+            $obj->getLancamentosById($debug);
             // nao deixa apagar lancamento de periodo ja fechado
             $this->exigirPeriodoAberto($obj->getDataCompetencia());
             $obj->excluir();
@@ -253,7 +253,7 @@ class GerenciarLancamentosContabeisAC {
         echo '{
         "statusMessage":"' . $ok . '",
         "message":      "' . tratarJson( $e->getMessage()) . '",
-        "codLancamentosContabeis":"' . $fws_['codLancamentosContabeis'] . '"
+        "codLancamentos":"' . $fws_['codLancamentos'] . '"
         }';
     }
 
@@ -310,7 +310,7 @@ class GerenciarLancamentosContabeisAC {
         return (mb_strtoupper($nome, 'UTF-8') === $nome) ? mb_convert_case($nome, MB_CASE_TITLE, 'UTF-8') : $nome;
     }
 
-    /** O evento ja tem catalogo contabil? Usado so para orientar a tela vazia. */
+    /** O evento ja tem catalogo financeiro? Usado so para orientar a tela vazia. */
     private function eventoTemPlanoContas($debug = false) {
         try {
             $objPC = new PlanoContas();
@@ -321,8 +321,8 @@ class GerenciarLancamentosContabeisAC {
         }
     }
 
-    public function carregarTabelaLancamentosContabeis($fws_, $debug = false) {
-        $obj = new LancamentosContabeis();
+    public function carregarTabelaLancamentos($fws_, $debug = false) {
+        $obj = new Lancamentos();
         try {
             $filtros = $this->filtrosDaTela($fws_);
             $lista = $obj->carregarListaFiltrada($filtros, $debug);
@@ -349,7 +349,7 @@ class GerenciarLancamentosContabeisAC {
                 $dtComp = $r['data_competencia'] ? date('d/m/Y', strtotime($r['data_competencia'])) : '';
                 $dtFin  = $r['data_financeira'] ? date('d/m/Y', strtotime($r['data_financeira'])) : '';
                 ?>
-                <tr id="<?php echo $r['cod_lancamentos_contabeis'] ?>">
+                <tr id="<?php echo $r['cod_lancamentos'] ?>">
                     <td>
                         <span class="editar btn-acao" title="Editar"><i class="fa fa-pencil"></i></span>
                         <span class="excluir btn-acao btn-acao-excluir" title="Excluir"><i class="fa fa-trash"></i></span>
@@ -361,8 +361,8 @@ class GerenciarLancamentosContabeisAC {
                         <?php } ?>
                     </td>
                     <td class="col-conta">
-                        <?php if ($r['codigo_contabil'] || $r['nome_plano_contas']) { ?>
-                            <span class="conta-codigo"><?php echo $r['codigo_contabil']; ?></span>
+                        <?php if ($r['codigo_financeiro'] || $r['nome_plano_contas']) { ?>
+                            <span class="conta-codigo"><?php echo $r['codigo_financeiro']; ?></span>
                             <span class="conta-nome"><?php echo $this->nomeAmigavel($r['nome_plano_contas']); ?></span>
                         <?php } else { ?>
                             <span style="color:#bbb;">sem conta</span>
@@ -387,7 +387,7 @@ class GerenciarLancamentosContabeisAC {
                     <td class="col-hist">
                         <?php echo $r['historico']; ?>
                         <?php if ($r['arquivo_comprovante']) { ?>
-                            <a href="<?php echo WB_URL_COMMAND ?>&c=GerenciarLancamentosContabeis&m=baixarComprovante&codLancamentosContabeis=<?php echo $r['cod_lancamentos_contabeis'] ?>&_submit_check=1"
+                            <a href="<?php echo WB_URL_COMMAND ?>&c=GerenciarLancamentos&m=baixarComprovante&codLancamentos=<?php echo $r['cod_lancamentos'] ?>&_submit_check=1"
                                target="_blank" title="Ver o comprovante anexado" style="margin-left:6px; color:#2980b9;">
                                 <i class="fa fa-paperclip"></i>
                             </a>
@@ -404,10 +404,10 @@ class GerenciarLancamentosContabeisAC {
                 echo "<tr><td colspan='10' style='padding:14px; color:#888;'>Nenhum lan&ccedil;amento encontrado"
                    . (count($filtros) ? " com os filtros informados." : ".");
                 // Sem filtro e sem nada na tela pode ser evento ainda sem catalogo
-                // contabil: leva direto para a tela que popula tudo de uma vez.
+                // financeiro: leva direto para a tela que popula tudo de uma vez.
                 if (!count($filtros) && !$this->eventoTemPlanoContas($debug)) {
                     echo ' O evento ainda n&atilde;o tem plano de contas.'
-                       . ' <a href="index.php?content=view/admin/ConfigurarContabilidade.php" '
+                       . ' <a href="index.php?content=view/admin/CatalogoFinanceiro.php" '
                        . 'style="margin-left:6px; font-weight:600;">Configurar agora</a>';
                 }
                 echo "</td></tr>";
@@ -435,11 +435,11 @@ class GerenciarLancamentosContabeisAC {
             echo "<tr><td></td><td colspan=7>";
             if ($e->getMessage()) {
                 echo $e->getMessage();
-                // Evento sem catalogo contabil: leva direto para a tela que
+                // Evento sem catalogo financeiro: leva direto para a tela que
                 // popula tudo de uma vez, em vez de deixar o usuario cadastrar
                 // item a item nas quatro telas.
                 if (strpos($e->getMessage(), 'Centro de Custo') !== false) {
-                    echo ' <a href="index.php?content=view/admin/ConfigurarContabilidade.php" '
+                    echo ' <a href="index.php?content=view/admin/CatalogoFinanceiro.php" '
                        . 'style="margin-left:6px; font-weight:600;">Configurar agora</a>';
                 }
             } else {
